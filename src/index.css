@@ -137,3 +137,21 @@ body {
   color: #ef4444;
   filter: drop-shadow(0 0 2px rgba(239,68,68,0.5));
 }
+
+@keyframes privacyFadeIn {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes privacyFadeOut {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(8px); }
+}
+
+.privacy-toast-enter {
+  animation: privacyFadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.privacy-toast-exit {
+  animation: privacyFadeOut 1.4s ease-in forwards;
+}

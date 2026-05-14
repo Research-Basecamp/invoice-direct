@@ -122,7 +122,8 @@ export async function downloadDOCX(form, logo, invoiceNumber) {
             width: { size: 50, type: WidthType.PERCENTAGE },
             children: [
               label('From'),
-              body(form.fromName),
+              ...(form.fromCompany ? [new Paragraph({ children: [new TextRun({ text: form.fromCompany, bold: true, size: 22, color: '111111', font: 'Calibri' })] })] : []),
+              ...(form.fromName ? [body(form.fromName)] : []),
               ...(form.fromAddress ? [body(form.fromAddress)] : []),
               ...(form.fromEmail ? [body(form.fromEmail)] : []),
               ...(form.fromPhone ? [body(form.fromPhone)] : []),
@@ -133,7 +134,8 @@ export async function downloadDOCX(form, logo, invoiceNumber) {
             width: { size: 50, type: WidthType.PERCENTAGE },
             children: [
               label('Bill To'),
-              body(form.billToName),
+              ...(form.billToCompany ? [new Paragraph({ children: [new TextRun({ text: form.billToCompany, bold: true, size: 22, color: '111111', font: 'Calibri' })] })] : []),
+              ...(form.billToContact ? [body(form.billToContact)] : []),
               ...(form.billToAddress ? [body(form.billToAddress)] : []),
               ...(form.billToEmail ? [body(form.billToEmail)] : []),
               ...(form.billToPhone ? [body(form.billToPhone)] : []),

@@ -9,11 +9,13 @@ import { downloadImage } from '@/lib/image'
 import { cn } from '@/lib/utils'
 
 const initialForm = {
+  fromCompany: '',
   fromName: '',
   fromAddress: '',
   fromEmail: '',
   fromPhone: '',
-  billToName: '',
+  billToCompany: '',
+  billToContact: '',
   billToAddress: '',
   billToEmail: '',
   billToPhone: '',
@@ -157,9 +159,11 @@ function DownloadMenuFull({ form, logo }) {
 export default function App() {
   const [form, setForm] = useState(initialForm)
   const [logo, setLogo] = useState(null)
-  const [formWidth, setFormWidth] = useState(460)
+  const [formPct, setFormPct] = useState(0.4)   // 40% form / 60% preview
   const [resizing, setResizing] = useState(false)
   const [showMobilePreview, setShowMobilePreview] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024)
+  const [privacyPhase, setPrivacyPhase] = useState('hidden') // hidden | enter | exit | gone
   const containerRef = useRef(null)
 
   const handlePrint = () => window.print()
@@ -170,13 +174,19 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)')
+    const handler = (e) => setIsDesktop(e.matches)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [])
+
+  useEffect(() => {
     if (!resizing) return
     const handleMouseMove = (e) => {
       if (!containerRef.current) return
       const rect = containerRef.current.getBoundingClientRect()
-      let width = e.clientX - rect.left
-      width = Math.max(320, Math.min(width, rect.width * 0.6))
-      setFormWidth(width)
+      const pct = (e.clientX - rect.left) / rect.width
+      setFormPct(Math.max(0.25, Math.min(pct, 0.65)))
     }
     const handleMouseUp = () => setResizing(false)
     document.addEventListener('mousemove', handleMouseMove)
@@ -191,6 +201,13 @@ export default function App() {
     document.body.style.overflow = showMobilePreview ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [showMobilePreview])
+
+  useEffect(() => {
+    const enterTimer = setTimeout(() => setPrivacyPhase('enter'), 800)
+    const exitTimer  = setTimeout(() => setPrivacyPhase('exit'),  6500)
+    const goneTimer  = setTimeout(() => setPrivacyPhase('gone'),  8000)
+    return () => { clearTimeout(enterTimer); clearTimeout(exitTimer); clearTimeout(goneTimer) }
+  }, [])
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -243,8 +260,8 @@ export default function App() {
         >
           {/* Form */}
           <section
-            className="overflow-y-auto p-4 sm:p-6 no-print bg-muted/20 lg:border-r lg:shrink-0 h-full"
-            style={{ width: formWidth, maxWidth: '100%' }}
+            className="overflow-y-auto p-4 sm:p-6 no-print bg-muted/20 lg:border-r h-full"
+            style={isDesktop ? { width: `${formPct * 100}%`, flexShrink: 0 } : { width: '100%' }}
           >
             <div className="mb-5">
               <h2 className="text-lg font-semibold">Invoice Details</h2>
@@ -294,6 +311,16 @@ export default function App() {
         <Eye className="h-4 w-4" />
         Preview
       </button>
+
+      {/* Privacy toast — fades in on load, then fades out */}
+      {privacyPhase !== 'hidden' && privacyPhase !== 'gone' && (
+        <div
+          className={`no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-background border shadow-lg text-sm text-muted-foreground whitespace-nowrap ${privacyPhase === 'enter' ? 'privacy-toast-enter' : 'privacy-toast-exit'}`}
+        >
+          <ShieldCheck className="h-4 w-4 shrink-0 text-green-500" />
+          <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
+        </div>
+      )}
 
       {/* Privacy footer */}
       <footer className="no-print border-t bg-background/80 py-3 px-4 sm:px-6">

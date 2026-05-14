@@ -10,7 +10,7 @@ const DISPLAY_H = PAPER_H
 export default function InvoicePreview({ form, logo }) {
   const html = useMemo(() => generateInvoiceHTML(form, logo), [form, logo])
 
-  const hasContent = form.fromName || form.billToName || form.items.some(i => i.description)
+  const hasContent = form.fromCompany || form.fromName || form.billToCompany || form.billToContact || form.items.some(i => i.description)
 
   if (!hasContent) {
     return (

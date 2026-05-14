@@ -117,14 +117,16 @@ export function renderInvoiceContent(form, logo) {
     <div class="parties">
       <div>
         <div class="party-label">From</div>
-        ${form.fromName ? `<div class="party-name">${esc(form.fromName)}</div>` : ''}
+        ${form.fromCompany ? `<div class="party-name">${esc(form.fromCompany)}</div>` : ''}
+        ${form.fromName ? `<div class="party-detail" style="font-weight:500;color:#333">${esc(form.fromName)}</div>` : ''}
         ${form.fromAddress ? `<div class="party-detail">${addrHtml(form.fromAddress)}</div>` : ''}
         ${form.fromEmail ? `<div class="party-detail">${esc(form.fromEmail)}</div>` : ''}
         ${form.fromPhone ? `<div class="party-detail">${esc(form.fromPhone)}</div>` : ''}
       </div>
       <div>
         <div class="party-label">Bill To</div>
-        ${form.billToName ? `<div class="party-name">${esc(form.billToName)}</div>` : ''}
+        ${form.billToCompany ? `<div class="party-name">${esc(form.billToCompany)}</div>` : ''}
+        ${form.billToContact ? `<div class="party-detail" style="font-weight:500;color:#333">${esc(form.billToContact)}</div>` : ''}
         ${form.billToAddress ? `<div class="party-detail">${addrHtml(form.billToAddress)}</div>` : ''}
         ${form.billToEmail ? `<div class="party-detail">${esc(form.billToEmail)}</div>` : ''}
         ${form.billToPhone ? `<div class="party-detail">${esc(form.billToPhone)}</div>` : ''}

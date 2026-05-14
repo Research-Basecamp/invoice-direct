@@ -106,22 +106,29 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
       </div>
 
       {/* From */}
-      <div className="grid sm:grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <Label>Your Name / Company</Label>
-          <Input value={form.fromName} onChange={(e) => updateField('fromName', e.target.value)} placeholder="Your name" />
-        </div>
-        <div className="space-y-1">
-          <Label>Email</Label>
-          <Input value={form.fromEmail} onChange={(e) => updateField('fromEmail', e.target.value)} placeholder="your@email.com" />
-        </div>
-        <div className="space-y-1">
-          <Label>Address</Label>
-          <AddressInput value={form.fromAddress} onChange={(val) => updateField('fromAddress', val)} placeholder="Your address" />
-        </div>
-        <div className="space-y-1">
-          <Label>Phone</Label>
-          <Input value={form.fromPhone} onChange={(e) => updateField('fromPhone', e.target.value)} placeholder="Your phone" />
+      <div>
+        <h3 className="text-sm font-medium mb-2">From</h3>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label>Company Name <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+            <Input value={form.fromCompany} onChange={(e) => updateField('fromCompany', e.target.value)} placeholder="Your company" />
+          </div>
+          <div className="space-y-1">
+            <Label>Your Name <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+            <Input value={form.fromName} onChange={(e) => updateField('fromName', e.target.value)} placeholder="Your name" />
+          </div>
+          <div className="space-y-1">
+            <Label>Email</Label>
+            <Input value={form.fromEmail} onChange={(e) => updateField('fromEmail', e.target.value)} placeholder="your@email.com" />
+          </div>
+          <div className="space-y-1">
+            <Label>Phone</Label>
+            <Input value={form.fromPhone} onChange={(e) => updateField('fromPhone', e.target.value)} placeholder="Your phone" />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label>Address</Label>
+            <AddressInput value={form.fromAddress} onChange={(val) => updateField('fromAddress', val)} placeholder="Your address" />
+          </div>
         </div>
       </div>
 
@@ -132,20 +139,24 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
         <h3 className="text-sm font-medium mb-2">Bill To</h3>
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label>Client Name</Label>
-            <Input value={form.billToName} onChange={(e) => updateField('billToName', e.target.value)} placeholder="Client name" />
+            <Label>Company Name <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+            <Input value={form.billToCompany} onChange={(e) => updateField('billToCompany', e.target.value)} placeholder="Client company" />
+          </div>
+          <div className="space-y-1">
+            <Label>Contact Person <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+            <Input value={form.billToContact} onChange={(e) => updateField('billToContact', e.target.value)} placeholder="Name or dept." />
           </div>
           <div className="space-y-1">
             <Label>Email</Label>
             <Input value={form.billToEmail} onChange={(e) => updateField('billToEmail', e.target.value)} placeholder="client@email.com" />
           </div>
           <div className="space-y-1">
-            <Label>Address</Label>
-            <AddressInput value={form.billToAddress} onChange={(val) => updateField('billToAddress', val)} placeholder="Client address" />
-          </div>
-          <div className="space-y-1">
             <Label>Phone</Label>
             <Input value={form.billToPhone} onChange={(e) => updateField('billToPhone', e.target.value)} placeholder="Client phone" />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label>Address</Label>
+            <AddressInput value={form.billToAddress} onChange={(val) => updateField('billToAddress', val)} placeholder="Client address" />
           </div>
         </div>
       </div>
