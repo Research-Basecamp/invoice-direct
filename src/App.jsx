@@ -315,7 +315,7 @@ export default function App() {
       {/* Privacy toast — fades in on load, then fades out */}
       {privacyPhase !== 'hidden' && privacyPhase !== 'gone' && (
         <div
-          className={`no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-background border shadow-lg text-sm text-muted-foreground whitespace-nowrap ${privacyPhase === 'enter' ? 'privacy-toast-enter' : 'privacy-toast-exit'}`}
+          className={`no-print fixed bottom-6 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-max sm:max-w-sm z-50 flex items-start sm:items-center gap-2.5 px-5 py-3 rounded-2xl bg-background border shadow-lg text-sm text-muted-foreground ${privacyPhase === 'enter' ? 'privacy-toast-enter' : 'privacy-toast-exit'}`}
         >
           <ShieldCheck className="h-4 w-4 shrink-0 text-green-500" />
           <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
