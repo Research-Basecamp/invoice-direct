@@ -2,6 +2,9 @@ import { Separator } from '@/components/ui/separator'
 import { formatCurrency, formatDate } from '@/lib/utils'
 
 export default function InvoicePreview({ form, logo }) {
+  const currency = form.currency || 'USD'
+  const fmt = (amount) => formatCurrency(amount, currency)
+
   const items = form.items.filter((i) => i.description)
   const subtotal = items.reduce((s, i) => s + i.quantity * i.rate, 0)
   const discountAmount = subtotal * (parseFloat(form.discountRate) || 0) / 100
@@ -74,8 +77,8 @@ export default function InvoicePreview({ form, logo }) {
               <tr key={i} className="border-b border-gray-100">
                 <td className="py-2 text-sm text-gray-900">{item.description}</td>
                 <td className="py-2 text-sm text-right text-gray-900">{item.quantity}</td>
-                <td className="py-2 text-sm text-right text-gray-900">{formatCurrency(item.rate)}</td>
-                <td className="py-2 text-sm text-right text-gray-900">{formatCurrency(item.quantity * item.rate)}</td>
+                <td className="py-2 text-sm text-right text-gray-900">{fmt(item.rate)}</td>
+                <td className="py-2 text-sm text-right text-gray-900">{fmt(item.quantity * item.rate)}</td>
               </tr>
             ))}
           </tbody>
@@ -87,24 +90,24 @@ export default function InvoicePreview({ form, logo }) {
         <div className="w-56 space-y-1">
           <div className="flex justify-between text-xs text-gray-600">
             <span>Subtotal</span>
-            <span>{formatCurrency(subtotal)}</span>
+            <span>{fmt(subtotal)}</span>
           </div>
           {discountAmount > 0 && (
             <div className="flex justify-between text-xs text-gray-600">
               <span>Discount ({(parseFloat(form.discountRate) || 0)}%)</span>
-              <span>-{formatCurrency(discountAmount)}</span>
+              <span>-{fmt(discountAmount)}</span>
             </div>
           )}
           {taxAmount > 0 && (
             <div className="flex justify-between text-xs text-gray-600">
               <span>Tax ({(parseFloat(form.taxRate) || 0)}%)</span>
-              <span>{formatCurrency(taxAmount)}</span>
+              <span>{fmt(taxAmount)}</span>
             </div>
           )}
           <Separator className="bg-gray-300" />
           <div className="flex justify-between font-bold text-base text-gray-900">
             <span>Total</span>
-            <span>{formatCurrency(total)}</span>
+            <span>{fmt(total)}</span>
           </div>
         </div>
       </div>

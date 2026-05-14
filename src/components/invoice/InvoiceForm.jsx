@@ -3,7 +3,43 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { Select, SelectItem, SelectGroup } from '@/components/ui/select'
+import { AddressInput } from '@/components/ui/address-input'
 import { Upload, Plus, Trash2 } from 'lucide-react'
+
+const CURRENCIES = [
+  { group: 'Common', items: [
+    { code: 'USD', label: 'USD — US Dollar ($)' },
+    { code: 'EUR', label: 'EUR — Euro (€)' },
+    { code: 'GBP', label: 'GBP — British Pound (£)' },
+    { code: 'JPY', label: 'JPY — Japanese Yen (¥)' },
+    { code: 'AUD', label: 'AUD — Australian Dollar (A$)' },
+    { code: 'CAD', label: 'CAD — Canadian Dollar (C$)' },
+    { code: 'CHF', label: 'CHF — Swiss Franc (CHF)' },
+    { code: 'CNY', label: 'CNY — Chinese Yuan (¥)' },
+    { code: 'INR', label: 'INR — Indian Rupee (₹)' },
+    { code: 'SGD', label: 'SGD — Singapore Dollar (S$)' },
+  ]},
+  { group: 'More', items: [
+    { code: 'HKD', label: 'HKD — Hong Kong Dollar (HK$)' },
+    { code: 'NZD', label: 'NZD — New Zealand Dollar (NZ$)' },
+    { code: 'SEK', label: 'SEK — Swedish Krona (kr)' },
+    { code: 'NOK', label: 'NOK — Norwegian Krone (kr)' },
+    { code: 'DKK', label: 'DKK — Danish Krone (kr)' },
+    { code: 'MXN', label: 'MXN — Mexican Peso (MX$)' },
+    { code: 'BRL', label: 'BRL — Brazilian Real (R$)' },
+    { code: 'KRW', label: 'KRW — South Korean Won (₩)' },
+    { code: 'AED', label: 'AED — UAE Dirham (د.إ)' },
+    { code: 'SAR', label: 'SAR — Saudi Riyal (﷼)' },
+    { code: 'ZAR', label: 'ZAR — South African Rand (R)' },
+    { code: 'PHP', label: 'PHP — Philippine Peso (₱)' },
+    { code: 'MYR', label: 'MYR — Malaysian Ringgit (RM)' },
+    { code: 'THB', label: 'THB — Thai Baht (฿)' },
+    { code: 'IDR', label: 'IDR — Indonesian Rupiah (Rp)' },
+    { code: 'PKR', label: 'PKR — Pakistani Rupee (₨)' },
+    { code: 'NPR', label: 'NPR — Nepalese Rupee (₨)' },
+  ]},
+]
 
 const emptyItem = { description: '', quantity: 0, rate: 0 }
 
@@ -43,7 +79,10 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
     <div className="space-y-6">
       {/* Logo */}
       <div className="space-y-1.5">
-        <Label>Company Logo</Label>
+        <div className="flex items-center gap-2">
+          <Label>Company Logo</Label>
+          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Optional</span>
+        </div>
         {logo ? (
           <div className="relative inline-block">
             <img src={logo} alt="Logo" className="h-20 w-20 object-contain rounded-lg border" />
@@ -78,7 +117,7 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
         </div>
         <div className="space-y-1">
           <Label>Address</Label>
-          <Input value={form.fromAddress} onChange={(e) => updateField('fromAddress', e.target.value)} placeholder="Your address" />
+          <AddressInput value={form.fromAddress} onChange={(val) => updateField('fromAddress', val)} placeholder="Your address" />
         </div>
         <div className="space-y-1">
           <Label>Phone</Label>
@@ -102,7 +141,7 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
           </div>
           <div className="space-y-1">
             <Label>Address</Label>
-            <Input value={form.billToAddress} onChange={(e) => updateField('billToAddress', e.target.value)} placeholder="Client address" />
+            <AddressInput value={form.billToAddress} onChange={(val) => updateField('billToAddress', val)} placeholder="Client address" />
           </div>
           <div className="space-y-1">
             <Label>Phone</Label>
@@ -127,6 +166,26 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
           <Label>Invoice # <span className="text-muted-foreground">(optional)</span></Label>
           <Input value={form.invoiceNumber} onChange={(e) => updateField('invoiceNumber', e.target.value)} placeholder="INV-001" />
         </div>
+      </div>
+
+      <Separator />
+
+      {/* Currency */}
+      <div className="space-y-1">
+        <Label>Currency</Label>
+        <Select
+          value={form.currency}
+          onValueChange={(val) => updateField('currency', val)}
+          placeholder="Select currency"
+        >
+          {CURRENCIES.map((group) => (
+            <SelectGroup key={group.group} label={group.group}>
+              {group.items.map((c) => (
+                <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
+        </Select>
       </div>
 
       <Separator />

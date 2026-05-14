@@ -113,3 +113,27 @@ body {
 .print-only {
   display: none;
 }
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0.6; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.sheet-slide-up {
+  animation: slideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.35); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.35); }
+  70%       { transform: scale(1); }
+}
+
+.heart-beat {
+  display: inline-block;
+  animation: heartbeat 1.4s ease-in-out infinite;
+  color: #ef4444;
+  filter: drop-shadow(0 0 2px rgba(239,68,68,0.5));
+}
