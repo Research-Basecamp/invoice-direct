@@ -220,7 +220,7 @@ export default function App() {
             </div>
             <div className="leading-tight">
               <span className="font-bold text-base tracking-tight">Invoice Direct</span>
-              <p className="text-[10px] text-muted-foreground hidden sm:block">Free invoice generator</p>
+              <p className="text-[10px] text-muted-foreground hidden sm:block">Free invoice generator &amp; template</p>
             </div>
           </div>
 
@@ -264,8 +264,8 @@ export default function App() {
             style={isDesktop ? { width: `${formPct * 100}%`, flexShrink: 0 } : { width: '100%' }}
           >
             <div className="mb-5">
-              <h2 className="text-lg font-semibold">Invoice Details</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Fill in the fields below to generate your invoice</p>
+              <h1 className="text-lg font-semibold">Free Invoice Generator</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">Create a free invoice or tax invoice template — download as PDF, Word or PNG</p>
             </div>
             <InvoiceForm form={form} setForm={setForm} logo={logo} setLogo={setLogo} />
 
