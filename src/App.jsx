@@ -265,7 +265,7 @@ export default function App() {
           >
             <div className="mb-5">
               <h1 className="text-lg font-semibold">Free Invoice Generator</h1>
-              <p className="text-xs text-muted-foreground mt-0.5">Create a free invoice or tax invoice template — download as PDF, Word or PNG</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Free invoice template &amp; tax invoice maker — download as PDF, Word or PNG</p>
             </div>
             <InvoiceForm form={form} setForm={setForm} logo={logo} setLogo={setLogo} />
 
