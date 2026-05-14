@@ -53,7 +53,7 @@ function DownloadMenu({ form, logo, className }) {
     try {
       if (key === 'pdf')   downloadPDF(form, logo, form.invoiceNumber)
       if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
-      if (key === 'image') await downloadImage(form.invoiceNumber)
+      if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
     } finally {
       setBusy(null)
     }
@@ -114,7 +114,7 @@ function DownloadMenuFull({ form, logo }) {
     try {
       if (key === 'pdf')   downloadPDF(form, logo, form.invoiceNumber)
       if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
-      if (key === 'image') await downloadImage(form.invoiceNumber)
+      if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
     } finally {
       setBusy(null)
     }
@@ -276,7 +276,7 @@ export default function App() {
           </div>
 
           {/* Preview — desktop only */}
-          <section className="hidden lg:flex lg:flex-col flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 min-w-0 bg-muted/10 h-full">
+          <section className="hidden lg:flex lg:flex-col flex-1 overflow-auto p-4 sm:p-6 lg:p-8 min-w-0 bg-muted/10 h-full">
             <div className="mb-5">
               <h2 className="text-lg font-semibold">Preview</h2>
               <p className="text-xs text-muted-foreground mt-0.5">Live preview of your invoice</p>
