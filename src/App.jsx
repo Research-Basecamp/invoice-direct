@@ -225,12 +225,11 @@ export default function App() {
               variant="outline"
               size="sm"
               className="gap-1.5 font-medium border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-              asChild
             >
-              <a href="https://buymeacoffee.com/yourusername" target="_blank" rel="noopener noreferrer">
+              <span>
                 <span className="heart-beat text-sm">♥</span>
                 <span className="hidden sm:inline">Support</span>
-              </a>
+              </span>
             </Button>
           </div>
         </div>
