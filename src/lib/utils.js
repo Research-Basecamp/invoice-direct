@@ -12,6 +12,46 @@ export function formatCurrency(amount, currency = 'USD') {
   }).format(amount)
 }
 
+// Matches US zip codes and UK/CA/AU-style postcodes
+const POSTCODE_RE = /^\d{4,6}(-\d{4})?$|^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i
+
+// Normalises any address string for display:
+// - Already multi-line (has \n): returned as-is
+// - Comma-separated Nominatim display_name: intelligently rebuilt into
+//   "street\ncity, state zip\ncountry", skipping suburbs/counties
+// - Plain string with no commas: returned as-is (user-typed)
+export function displayAddress(addr) {
+  if (!addr) return ''
+  if (addr.includes('\n')) return addr
+
+  const parts = addr.split(', ').map(s => s.trim()).filter(Boolean)
+  if (parts.length <= 2) return addr
+
+  // Nominatim sometimes emits house number as its own segment, e.g. "1622, Latrobe Street, ..."
+  const streetEnd = /^\d+[a-zA-Z]?$/.test(parts[0]) ? 2 : 1
+  const street = parts.slice(0, streetEnd).join(' ')
+  const rest = parts.slice(streetEnd)
+
+  // Find the postcode to anchor the city/state line
+  const zipIdx = rest.findIndex(p => POSTCODE_RE.test(p))
+
+  if (zipIdx !== -1) {
+    const zip = rest[zipIdx]
+    const state = zipIdx > 0 ? rest[zipIdx - 1] : ''
+    // Walk backwards past any "County"-suffixed intermediate parts to find the city
+    let cityIdx = zipIdx - 2
+    while (cityIdx >= 0 && /\bcounty\b/i.test(rest[cityIdx])) cityIdx--
+    const city = cityIdx >= 0 ? rest[cityIdx] : ''
+    const cityLine = [city, state, zip].filter(Boolean).join(', ')
+    const country = rest.slice(zipIdx + 1).join(', ')
+    return [street, cityLine, country].filter(Boolean).join('\n')
+  }
+
+  // No postcode found — street on line 1, everything else on line 2
+  const remaining = rest.join(', ')
+  return remaining ? `${street}\n${remaining}` : street
+}
+
 export function formatDate(date) {
   if (!date) return ''
   return new Intl.DateTimeFormat('en-US', {

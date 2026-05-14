@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate } from './utils'
+import { formatCurrency, formatDate, displayAddress } from './utils'
 
 export function downloadPDF(invoice, logo, invoiceNumber) {
   const items = invoice.items.filter((i) => i.description)
@@ -27,14 +27,14 @@ export function downloadPDF(invoice, logo, invoiceNumber) {
         .header h1 { font-size: 28px; font-weight: 800; color: #111; }
         .header-right { text-align: right; }
         .header-right .num { font-size: 16px; font-weight: 600; }
-        .header-right .date { font-size: 12px; color: #666; }
+        .header-right .date { font-size: 12px; color: #111; }
         .logo { height: 56px; width: 56px; object-fit: contain; margin-bottom: 8px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
-        .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #999; margin-bottom: 2px; }
+        .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #111; margin-bottom: 2px; }
         .name { font-weight: 600; font-size: 14px; }
-        .detail { font-size: 12px; color: #555; }
+        .detail { font-size: 12px; color: #555; white-space: pre-line; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th { text-align: left; padding: 6px 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #999; border-bottom: 1px solid #ccc; }
+        th { text-align: left; padding: 6px 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #111; border-bottom: 1px solid #ccc; }
         th:not(:first-child) { text-align: right; }
         td { padding: 8px 0; font-size: 14px; border-bottom: 1px solid #eee; }
         td:not(:first-child) { text-align: right; }
@@ -46,7 +46,7 @@ export function downloadPDF(invoice, logo, invoiceNumber) {
         .footer { border-top: 1px solid #ccc; padding-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         .footer .label { margin-bottom: 2px; }
         .footer p { font-size: 12px; color: #555; white-space: pre-wrap; }
-        .no-content { text-align: center; padding: 80px 0; color: #999; font-size: 14px; }
+        .no-content { text-align: center; padding: 80px 0; color: #111; font-size: 14px; }
         @media print { body { padding: 40px; } }
       </style>
     </head>
@@ -67,14 +67,14 @@ export function downloadPDF(invoice, logo, invoiceNumber) {
         <div>
           <div class="label">From</div>
           <div class="name">${invoice.fromName || '—'}</div>
-          ${invoice.fromAddress ? `<div class="detail">${invoice.fromAddress}</div>` : ''}
+          ${invoice.fromAddress ? `<div class="detail">${displayAddress(invoice.fromAddress).replace(/\n/g, '<br>')}</div>` : ''}
           ${invoice.fromEmail ? `<div class="detail">${invoice.fromEmail}</div>` : ''}
           ${invoice.fromPhone ? `<div class="detail">${invoice.fromPhone}</div>` : ''}
         </div>
         <div>
           <div class="label">Bill To</div>
           <div class="name">${invoice.billToName || '—'}</div>
-          ${invoice.billToAddress ? `<div class="detail">${invoice.billToAddress}</div>` : ''}
+          ${invoice.billToAddress ? `<div class="detail">${displayAddress(invoice.billToAddress).replace(/\n/g, '<br>')}</div>` : ''}
           ${invoice.billToEmail ? `<div class="detail">${invoice.billToEmail}</div>` : ''}
           ${invoice.billToPhone ? `<div class="detail">${invoice.billToPhone}</div>` : ''}
         </div>

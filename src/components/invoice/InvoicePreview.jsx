@@ -1,5 +1,5 @@
 import { Separator } from '@/components/ui/separator'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate, displayAddress } from '@/lib/utils'
 
 export default function InvoicePreview({ form, logo }) {
   const currency = form.currency || 'USD'
@@ -36,28 +36,28 @@ export default function InvoicePreview({ form, logo }) {
           {form.invoiceNumber && (
             <p className="text-base font-semibold text-gray-900">{form.invoiceNumber}</p>
           )}
-          <p className="text-xs text-gray-500">Date: {formatDate(form.date)}</p>
-          {form.dueDate && <p className="text-xs text-gray-500">Due: {formatDate(form.dueDate)}</p>}
+          <p className="text-xs text-gray-900">Date: {formatDate(form.date)}</p>
+          {form.dueDate && <p className="text-xs text-gray-900">Due: {formatDate(form.dueDate)}</p>}
         </div>
       </div>
 
       {/* From / Bill To */}
       <div className="grid grid-cols-2 gap-6 mb-6">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5">From</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-900 mb-0.5">From</p>
           {form.fromName && <p className="font-medium text-gray-900 text-sm">{form.fromName}</p>}
-          {form.fromAddress && <p className="text-xs text-gray-600">{form.fromAddress}</p>}
+          {form.fromAddress && <p className="text-xs text-gray-600 whitespace-pre-line">{displayAddress(form.fromAddress)}</p>}
           {form.fromEmail && <p className="text-xs text-gray-600">{form.fromEmail}</p>}
           {form.fromPhone && <p className="text-xs text-gray-600">{form.fromPhone}</p>}
-          {!form.fromName && <p className="text-xs text-gray-400 italic">Your details</p>}
+          {!form.fromName && <p className="text-xs text-gray-900 italic">Your details</p>}
         </div>
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5">Bill To</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-900 mb-0.5">Bill To</p>
           {form.billToName && <p className="font-medium text-gray-900 text-sm">{form.billToName}</p>}
-          {form.billToAddress && <p className="text-xs text-gray-600">{form.billToAddress}</p>}
+          {form.billToAddress && <p className="text-xs text-gray-600 whitespace-pre-line">{displayAddress(form.billToAddress)}</p>}
           {form.billToEmail && <p className="text-xs text-gray-600">{form.billToEmail}</p>}
           {form.billToPhone && <p className="text-xs text-gray-600">{form.billToPhone}</p>}
-          {!form.billToName && <p className="text-xs text-gray-400 italic">Client details</p>}
+          {!form.billToName && <p className="text-xs text-gray-900 italic">Client details</p>}
         </div>
       </div>
 
@@ -66,10 +66,10 @@ export default function InvoicePreview({ form, logo }) {
         <table className="w-full mb-5">
           <thead>
             <tr className="border-b border-gray-300">
-              <th className="text-left py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">Description</th>
-              <th className="text-right py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">Qty</th>
-              <th className="text-right py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">Rate</th>
-              <th className="text-right py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">Amount</th>
+              <th className="text-left py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-900">Description</th>
+              <th className="text-right py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-900">Qty</th>
+              <th className="text-right py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-900">Rate</th>
+              <th className="text-right py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-900">Amount</th>
             </tr>
           </thead>
           <tbody>
@@ -117,13 +117,13 @@ export default function InvoicePreview({ form, logo }) {
         <div className="border-t border-gray-300 pt-3 grid grid-cols-2 gap-6">
           {form.notes && (
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5">Notes</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-900 mb-0.5">Notes</p>
               <p className="text-xs text-gray-600 whitespace-pre-wrap">{form.notes}</p>
             </div>
           )}
           {form.paymentTerms && (
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-0.5">Payment Terms</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-900 mb-0.5">Payment Terms</p>
               <p className="text-xs text-gray-600 whitespace-pre-wrap">{form.paymentTerms}</p>
             </div>
           )}

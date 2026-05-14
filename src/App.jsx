@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import InvoiceForm from '@/components/invoice/InvoiceForm'
 import InvoicePreview from '@/components/invoice/InvoicePreview'
 import { Button } from '@/components/ui/button'
-import { Printer, Download, FileText, Eye, ArrowLeft, X, ChevronDown, Image } from 'lucide-react'
+import { Printer, Download, FileText, Eye, ArrowLeft, X, ChevronDown, Image, ShieldCheck } from 'lucide-react'
 import { downloadPDF } from '@/lib/pdf'
 import { downloadDOCX } from '@/lib/docx'
 import { downloadImage } from '@/lib/image'
@@ -235,15 +235,15 @@ export default function App() {
         </div>
       </header>
 
-      <main className="pt-16">
+      <main className="pt-16 h-screen">
         <div
           ref={containerRef}
-          className="flex max-w-[1600px] mx-auto min-h-[calc(100vh-4rem)]"
+          className="flex max-w-[1600px] mx-auto h-[calc(100vh-4rem)]"
           style={{ userSelect: resizing ? 'none' : undefined }}
         >
           {/* Form */}
           <section
-            className="overflow-y-auto p-4 sm:p-6 no-print bg-muted/20 lg:border-r lg:shrink-0"
+            className="overflow-y-auto p-4 sm:p-6 no-print bg-muted/20 lg:border-r lg:shrink-0 h-full"
             style={{ width: formWidth, maxWidth: '100%' }}
           >
             <div className="mb-5">
@@ -276,7 +276,7 @@ export default function App() {
           </div>
 
           {/* Preview — desktop only */}
-          <section className="hidden lg:block flex-1 p-4 sm:p-6 lg:p-8 min-w-0 bg-muted/10">
+          <section className="hidden lg:flex lg:flex-col flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 min-w-0 bg-muted/10 h-full">
             <div className="mb-5">
               <h2 className="text-lg font-semibold">Preview</h2>
               <p className="text-xs text-muted-foreground mt-0.5">Live preview of your invoice</p>
@@ -294,6 +294,14 @@ export default function App() {
         <Eye className="h-4 w-4" />
         Preview
       </button>
+
+      {/* Privacy footer */}
+      <footer className="no-print border-t bg-background/80 py-3 px-4 sm:px-6">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-green-500" />
+          <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
+        </div>
+      </footer>
 
       {/* Mobile preview bottom sheet */}
       {showMobilePreview && (
