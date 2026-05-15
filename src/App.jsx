@@ -54,7 +54,7 @@ function DownloadMenu({ form, logo, className }) {
     setOpen(false)
     setBusy(key)
     try {
-      if (key === 'pdf')   downloadPDF(form, logo, form.invoiceNumber)
+      if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
       if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
       if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
     } finally {
@@ -115,7 +115,7 @@ function DownloadMenuFull({ form, logo }) {
     setOpen(false)
     setBusy(key)
     try {
-      if (key === 'pdf')   downloadPDF(form, logo, form.invoiceNumber)
+      if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
       if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
       if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
     } finally {
