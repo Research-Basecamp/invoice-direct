@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
-  base: '/invoice-direct/',
+  base: '/free-invoice/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
