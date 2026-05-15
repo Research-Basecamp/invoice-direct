@@ -68,7 +68,8 @@ export async function downloadDOCX(form, logo, invoiceNumber) {
   const discountAmount = subtotal * (parseFloat(form.discountRate) || 0) / 100
   const afterDiscount = subtotal - discountAmount
   const taxAmount = afterDiscount * (parseFloat(form.taxRate) || 0) / 100
-  const total = afterDiscount + taxAmount
+  const deliveryAmount = parseFloat(form.delivery) || 0
+  const total = afterDiscount + taxAmount + deliveryAmount
 
   // --- Header row ---
   const headerSection = new Table({
@@ -206,6 +207,13 @@ export async function downloadDOCX(form, logo, invoiceNumber) {
         new TableCell({ borders: BORDER_NONE, children: [new Paragraph('')] }),
         new TableCell({ borders: BORDER_NONE, children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: `Tax (${parseFloat(form.taxRate) || 0}%)`, size: 20, color: '555555', font: 'Calibri' })] })] }),
         new TableCell({ borders: BORDER_NONE, children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: fmt(taxAmount), size: 20, color: '555555', font: 'Calibri' })] })] }),
+      ],
+    })] : []),
+    ...(deliveryAmount > 0 ? [new TableRow({
+      children: [
+        new TableCell({ borders: BORDER_NONE, children: [new Paragraph('')] }),
+        new TableCell({ borders: BORDER_NONE, children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: 'Delivery', size: 20, color: '555555', font: 'Calibri' })] })] }),
+        new TableCell({ borders: BORDER_NONE, children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: fmt(deliveryAmount), size: 20, color: '555555', font: 'Calibri' })] })] }),
       ],
     })] : []),
     new TableRow({

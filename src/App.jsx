@@ -26,6 +26,7 @@ const initialForm = {
   items: [{ description: '', quantity: 0, rate: 0 }],
   taxRate: '',
   discountRate: '',
+  delivery: '',
   notes: '',
   paymentTerms: '',
 }
@@ -262,7 +263,7 @@ export default function App() {
             </div>
             <div className="leading-tight">
               <span className="font-bold text-base tracking-tight">Invoice In Minute</span>
-              <p className="text-[10px] text-muted-foreground hidden sm:block">Free invoice generator &amp; template</p>
+              <p className="text-[10px] text-muted-foreground hidden sm:block">Free invoice generator</p>
             </div>
           </div>
 
@@ -307,7 +308,7 @@ export default function App() {
           >
             <div className="mb-5">
               <h1 className="text-lg font-semibold">Free Invoice Generator</h1>
-              <p className="text-xs text-muted-foreground mt-0.5">Free invoice template &amp; tax invoice maker — download as PDF, Word or PNG</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Tax invoice maker — download as PDF, Word or PNG. Free, no sign-up.</p>
             </div>
             <InvoiceForm form={form} setForm={setForm} logo={logo} setLogo={setLogo} />
 

@@ -1,3 +1,4 @@
+import { useState, useRef } from 'react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -5,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Select, SelectItem, SelectGroup } from '@/components/ui/select'
 import { AddressInput } from '@/components/ui/address-input'
-import { Upload, Plus, Trash2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Upload, Plus, Trash2, ImagePlus } from 'lucide-react'
 
 const CURRENCIES = [
   { group: 'Common', items: [
@@ -44,6 +46,9 @@ const CURRENCIES = [
 const emptyItem = { description: '', quantity: 0, rate: 0 }
 
 export default function InvoiceForm({ form, setForm, logo, setLogo }) {
+  const [isDragging, setIsDragging] = useState(false)
+  const fileInputRef = useRef(null)
+
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
@@ -75,6 +80,26 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
     }
   }
 
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) setIsDragging(false)
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (ev) => setLogo(ev.target.result)
+      reader.readAsDataURL(file)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Logo */}
@@ -95,15 +120,59 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
             </button>
           </div>
         ) : (
-          <label className="flex items-center gap-2 cursor-pointer w-fit">
-            <div className="flex items-center gap-2 px-3 py-1.5 border rounded-lg text-sm text-muted-foreground hover:bg-muted">
-              <Upload className="h-4 w-4" />
-              Upload Logo
+          <>
+            {/* Desktop: drag-and-drop zone */}
+            <div
+              className={cn(
+                'hidden sm:flex flex-col items-center justify-center gap-1.5 w-48 h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors',
+                isDragging
+                  ? 'border-primary bg-primary/5 text-primary'
+                  : 'border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/60 hover:bg-muted/50'
+              )}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <ImagePlus className="h-6 w-6" />
+              <p className="text-xs text-center leading-tight">
+                Drag & drop or<br />click to upload
+              </p>
             </div>
-            <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-          </label>
+
+            {/* Mobile: simple button */}
+            <label className="sm:hidden flex items-center gap-2 cursor-pointer w-fit">
+              <div className="flex items-center gap-2 px-3 py-1.5 border rounded-lg text-sm text-muted-foreground hover:bg-muted">
+                <Upload className="h-4 w-4" />
+                Upload Logo
+              </div>
+              <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+            </label>
+
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+          </>
         )}
       </div>
+
+      {/* Currency */}
+      <div className="space-y-1">
+        <Label>Currency</Label>
+        <Select
+          value={form.currency}
+          onValueChange={(val) => updateField('currency', val)}
+          placeholder="Select currency"
+        >
+          {CURRENCIES.map((group) => (
+            <SelectGroup key={group.group} label={group.group}>
+              {group.items.map((c) => (
+                <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
+        </Select>
+      </div>
+
+      <Separator />
 
       {/* From */}
       <div>
@@ -177,26 +246,6 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
           <Label>Invoice # <span className="text-muted-foreground">(optional)</span></Label>
           <Input value={form.invoiceNumber} onChange={(e) => updateField('invoiceNumber', e.target.value)} placeholder="INV-001" />
         </div>
-      </div>
-
-      <Separator />
-
-      {/* Currency */}
-      <div className="space-y-1">
-        <Label>Currency</Label>
-        <Select
-          value={form.currency}
-          onValueChange={(val) => updateField('currency', val)}
-          placeholder="Select currency"
-        >
-          {CURRENCIES.map((group) => (
-            <SelectGroup key={group.group} label={group.group}>
-              {group.items.map((c) => (
-                <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>
-              ))}
-            </SelectGroup>
-          ))}
-        </Select>
       </div>
 
       <Separator />
@@ -277,8 +326,8 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
 
       <Separator />
 
-      {/* Tax & Discount */}
-      <div className="grid sm:grid-cols-2 gap-3">
+      {/* Tax, Discount & Delivery */}
+      <div className="grid sm:grid-cols-3 gap-3">
         <div className="space-y-1">
           <Label>Discount (%)</Label>
           <Input type="number" min="0" max="100" step="0.1" value={form.discountRate} onChange={(e) => updateField('discountRate', e.target.value)} placeholder="0" />
@@ -286,6 +335,10 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
         <div className="space-y-1">
           <Label>Tax (%)</Label>
           <Input type="number" min="0" max="100" step="0.1" value={form.taxRate} onChange={(e) => updateField('taxRate', e.target.value)} placeholder="0" />
+        </div>
+        <div className="space-y-1">
+          <Label>Delivery / Shipping</Label>
+          <Input type="number" min="0" step="0.01" value={form.delivery} onChange={(e) => updateField('delivery', e.target.value)} placeholder="0.00" />
         </div>
       </div>
 

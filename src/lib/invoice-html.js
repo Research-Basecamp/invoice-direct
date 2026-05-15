@@ -98,7 +98,8 @@ export function renderInvoiceContent(form, logo) {
   const discountAmt = subtotal * (parseFloat(form.discountRate) || 0) / 100
   const afterDiscount = subtotal - discountAmt
   const taxAmt = afterDiscount * (parseFloat(form.taxRate) || 0) / 100
-  const total = afterDiscount + taxAmt
+  const deliveryAmt = parseFloat(form.delivery) || 0
+  const total = afterDiscount + taxAmt + deliveryAmt
 
   return `
   <div class="page">
@@ -160,6 +161,7 @@ export function renderInvoiceContent(form, logo) {
         <div class="totals-row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
         ${discountAmt > 0 ? `<div class="totals-row"><span>Discount (${parseFloat(form.discountRate) || 0}%)</span><span>-${fmt(discountAmt)}</span></div>` : ''}
         ${taxAmt > 0 ? `<div class="totals-row"><span>Tax (${parseFloat(form.taxRate) || 0}%)</span><span>${fmt(taxAmt)}</span></div>` : ''}
+        ${deliveryAmt > 0 ? `<div class="totals-row"><span>Delivery</span><span>${fmt(deliveryAmt)}</span></div>` : ''}
         <div class="totals-row total"><span>Total</span><span>${fmt(total)}</span></div>
       </div>
     </div>
