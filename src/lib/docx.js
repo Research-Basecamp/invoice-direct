@@ -248,9 +248,19 @@ export async function downloadDOCX(form, logo, invoiceNumber) {
 
   const blob = await Packer.toBlob(doc)
   const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `invoice-${invoiceNumber || 'draft'}.docx`
-  a.click()
-  URL.revokeObjectURL(url)
+  const filename = `invoice-${invoiceNumber || 'draft'}.docx`
+  // On mobile the blob URL must be opened in a new tab — programmatic link.click()
+  // is blocked on iOS after async work loses the user-gesture context.
+  const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+    ('ontouchstart' in window && navigator.maxTouchPoints > 0)
+  if (mobile) {
+    window.open(url, '_blank')
+    setTimeout(() => URL.revokeObjectURL(url), 60000)
+  } else {
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 }
