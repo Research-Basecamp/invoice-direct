@@ -9,7 +9,7 @@ export function captureInvoiceToCanvas(form, logo) {
     document.body.appendChild(iframe)
 
     const cleanup = () => {
-      try { document.body.removeChild(iframe) } catch (_) {}
+      if (iframe.parentNode) document.body.removeChild(iframe)
     }
 
     iframe.addEventListener('load', async () => {
