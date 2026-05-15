@@ -261,7 +261,7 @@ export default function App() {
               <FileText className="h-4 w-4" />
             </div>
             <div className="leading-tight">
-              <span className="font-bold text-base tracking-tight">invoiceinminute</span>
+              <span className="font-bold text-base tracking-tight">Invoice In Minute</span>
               <p className="text-[10px] text-muted-foreground hidden sm:block">Free invoice generator &amp; template</p>
             </div>
           </div>
