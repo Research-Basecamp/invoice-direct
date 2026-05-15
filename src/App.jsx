@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react'
 import InvoiceForm from '@/components/invoice/InvoiceForm'
 import InvoicePreview from '@/components/invoice/InvoicePreview'
 import { Button } from '@/components/ui/button'
@@ -152,6 +152,48 @@ function DownloadMenuFull({ form, logo }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// Scales InvoicePreview to fit the available width, then sizes itself to the scaled height
+function ScaledPreview({ form, logo }) {
+  const outerRef = useRef(null)
+  const contentRef = useRef(null)
+  const [scale, setScale] = useState(1)
+  const [scaledHeight, setScaledHeight] = useState(0)
+
+  const compute = useCallback(() => {
+    if (!outerRef.current || !contentRef.current) return
+    const availW = outerRef.current.clientWidth
+    const contentW = contentRef.current.scrollWidth
+    const contentH = contentRef.current.scrollHeight
+    if (!availW || !contentW || !contentH) return
+    const newScale = Math.min(availW / contentW, 1)
+    setScale(newScale)
+    setScaledHeight(Math.ceil(contentH * newScale))
+  }, [])
+
+  useLayoutEffect(() => { compute() }, [form, logo, compute])
+
+  useEffect(() => {
+    const ro = new ResizeObserver(compute)
+    if (outerRef.current) ro.observe(outerRef.current)
+    if (contentRef.current) ro.observe(contentRef.current)
+    return () => ro.disconnect()
+  }, [compute])
+
+  return (
+    <div ref={outerRef} className="w-full px-3 pt-2 pb-4">
+      {/* Height is set to exactly the scaled content height — no empty space */}
+      <div style={{ height: scaledHeight || 'auto', overflow: 'hidden' }}>
+        <div
+          ref={contentRef}
+          style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}
+        >
+          <InvoicePreview form={form} logo={logo} />
+        </div>
+      </div>
     </div>
   )
 }
@@ -337,7 +379,7 @@ export default function App() {
             className="absolute inset-0 bg-black/50"
             onClick={() => setShowMobilePreview(false)}
           />
-          <div className="sheet-slide-up relative bg-background rounded-t-3xl flex flex-col max-h-[92vh] overflow-hidden shadow-2xl">
+          <div className="sheet-slide-up relative bg-background rounded-t-3xl flex flex-col max-h-[92vh] overflow-y-auto shadow-2xl">
             <div className="flex justify-center pt-3 pb-1 shrink-0">
               <div className="w-10 h-1.5 rounded-full bg-muted-foreground/25" />
             </div>
@@ -358,9 +400,7 @@ export default function App() {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="overflow-y-auto p-4 pb-10">
-              <InvoicePreview form={form} logo={logo} />
-            </div>
+            <ScaledPreview form={form} logo={logo} />
           </div>
         </div>
       )}

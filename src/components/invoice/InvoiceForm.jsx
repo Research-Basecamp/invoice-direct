@@ -203,48 +203,73 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
 
       {/* Line Items */}
       <div>
-        <div className="grid grid-cols-12 gap-2 mb-1.5 text-xs font-medium text-muted-foreground">
+        {/* Desktop header */}
+        <div className="hidden sm:grid grid-cols-12 gap-2 mb-1.5 text-xs font-medium text-muted-foreground">
           <div className="col-span-5">Description</div>
           <div className="col-span-2">Qty</div>
           <div className="col-span-2">Rate</div>
           <div className="col-span-2">Amount</div>
           <div className="col-span-1" />
         </div>
+
         <div className="space-y-2">
           {form.items.map((item, i) => (
-            <div key={i} className="grid grid-cols-12 gap-2 items-end">
-              <div className="col-span-5">
-                <Input
-                  placeholder="Description"
-                  value={item.description}
-                  onChange={(e) => handleItemChange(i, { ...item, description: e.target.value })}
-                />
+            <div key={i}>
+              {/* Desktop row */}
+              <div className="hidden sm:grid grid-cols-12 gap-2 items-end">
+                <div className="col-span-5">
+                  <Input placeholder="Description" value={item.description}
+                    onChange={(e) => handleItemChange(i, { ...item, description: e.target.value })} />
+                </div>
+                <div className="col-span-2">
+                  <Input type="number" min="0" placeholder="0" value={item.quantity || ''}
+                    onChange={(e) => handleItemChange(i, { ...item, quantity: parseFloat(e.target.value) || 0 })} />
+                </div>
+                <div className="col-span-2">
+                  <Input type="number" min="0" step="0.01" placeholder="0.00" value={item.rate || ''}
+                    onChange={(e) => handleItemChange(i, { ...item, rate: parseFloat(e.target.value) || 0 })} />
+                </div>
+                <div className="col-span-2">
+                  <Input type="number" value={(item.quantity * item.rate).toFixed(2)} readOnly className="bg-muted" />
+                </div>
+                <div className="col-span-1 flex justify-center">
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(i)} className="h-9 w-9 text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="col-span-2">
-                <Input
-                  type="number" min="0" placeholder="0"
-                  value={item.quantity || ''}
-                  onChange={(e) => handleItemChange(i, { ...item, quantity: parseFloat(e.target.value) || 0 })}
-                />
-              </div>
-              <div className="col-span-2">
-                <Input
-                  type="number" min="0" step="0.01" placeholder="0.00"
-                  value={item.rate || ''}
-                  onChange={(e) => handleItemChange(i, { ...item, rate: parseFloat(e.target.value) || 0 })}
-                />
-              </div>
-              <div className="col-span-2">
-                <Input type="number" value={(item.quantity * item.rate).toFixed(2)} readOnly className="bg-muted" />
-              </div>
-              <div className="col-span-1">
-                <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(i)} className="h-10 w-10 text-destructive">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+
+              {/* Mobile card */}
+              <div className="sm:hidden border rounded-lg p-2.5 space-y-2">
+                <Input placeholder="Description" value={item.description}
+                  onChange={(e) => handleItemChange(i, { ...item, description: e.target.value })} />
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] text-muted-foreground">Qty</p>
+                    <Input type="number" min="0" placeholder="0" value={item.quantity || ''}
+                      onChange={(e) => handleItemChange(i, { ...item, quantity: parseFloat(e.target.value) || 0 })} />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] text-muted-foreground">Rate</p>
+                    <Input type="number" min="0" step="0.01" placeholder="0.00" value={item.rate || ''}
+                      onChange={(e) => handleItemChange(i, { ...item, rate: parseFloat(e.target.value) || 0 })} />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] text-muted-foreground">Amount</p>
+                    <Input type="number" value={(item.quantity * item.rate).toFixed(2)} readOnly className="bg-muted" />
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(i)}
+                    className="h-7 px-2 text-xs text-destructive gap-1">
+                    <Trash2 className="h-3 w-3" /> Remove
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
         </div>
+
         <Button type="button" variant="outline" size="sm" onClick={addItem} className="mt-2">
           <Plus className="h-4 w-4 mr-1" /> Add Item
         </Button>
