@@ -8,6 +8,97 @@ import { downloadDOCX } from '@/lib/docx'
 import { downloadImage } from '@/lib/image'
 import { cn } from '@/lib/utils'
 
+function isMobileDevice() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+    ('ontouchstart' in window && navigator.maxTouchPoints > 0)
+}
+function isIOS() {
+  return /iPhone|iPad|iPod/.test(navigator.userAgent)
+}
+
+const MOBILE_STEPS = {
+  pdf: {
+    ios: [
+      { n: '1', text: <>Tap the <strong>Share</strong> button <span className="font-mono bg-muted px-1 rounded text-xs">□↑</span> at the bottom of Safari</> },
+      { n: '2', text: <>Scroll down and tap <strong>Print</strong></> },
+      { n: '3', text: <>Pinch-open the preview to expand it, then tap <strong>Share → Save to Files</strong></> },
+    ],
+    android: [
+      { n: '1', text: <>Tap the <strong>⋮ menu</strong> at the top right of Chrome</> },
+      { n: '2', text: <>Tap <strong>Print</strong></> },
+      { n: '3', text: <>Change destination to <strong>Save as PDF</strong> and tap Save</> },
+    ],
+  },
+  image: {
+    ios: [
+      { n: '1', text: <>Close this and tap the <strong>Preview</strong> button (bottom-left)</> },
+      { n: '2', text: <>Press <strong>Side button + Volume Up</strong> to take a screenshot</> },
+      { n: '3', text: <>Your screenshot saves to <strong>Photos</strong> automatically</> },
+    ],
+    android: [
+      { n: '1', text: <>Close this and tap the <strong>Preview</strong> button (bottom-left)</> },
+      { n: '2', text: <>Press <strong>Power + Volume Down</strong> to take a screenshot</> },
+      { n: '3', text: <>Find it in your <strong>Gallery / Photos</strong></> },
+    ],
+  },
+  docx: {
+    ios: [
+      { n: '1', text: <>The share sheet appeared — choose <strong>Save to Files</strong> or open in <strong>Word / Pages</strong></> },
+      { n: '2', text: <>If it didn&apos;t appear, try tapping <strong>Download</strong> again</> },
+    ],
+    android: [
+      { n: '1', text: <>The file should download to your <strong>Downloads</strong> folder</> },
+      { n: '2', text: <>Open with <strong>Google Docs</strong> or Microsoft Word</> },
+    ],
+  },
+}
+
+function MobileDownloadHint({ format, onClose }) {
+  if (!format) return null
+  const os = isIOS() ? 'ios' : 'android'
+  const steps = MOBILE_STEPS[format]?.[os] ?? []
+  const titles = { pdf: 'Save as PDF', image: 'Save as Image', docx: 'Open Word File' }
+  const icons = { pdf: '📄', image: '🖼️', docx: '📝' }
+
+  return (
+    <div className="lg:hidden no-print fixed inset-0 z-[70] flex flex-col justify-end">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="sheet-slide-up relative bg-background rounded-t-3xl shadow-2xl">
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1.5 rounded-full bg-muted-foreground/25" />
+        </div>
+        <div className="px-5 pb-8 pt-2">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{icons[format]}</span>
+              <div>
+                <p className="font-semibold text-base">{titles[format]}</p>
+                <p className="text-xs text-muted-foreground">{isIOS() ? 'iOS' : 'Android'} instructions</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            {steps.map((step) => (
+              <div key={step.n} className="flex gap-3 items-start">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center mt-0.5">
+                  {step.n}
+                </span>
+                <p className="text-sm text-foreground leading-relaxed">{step.text}</p>
+              </div>
+            ))}
+          </div>
+
+          <Button className="w-full" onClick={onClose}>Got it</Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const initialForm = {
   fromCompany: '',
   fromName: '',
@@ -37,7 +128,7 @@ const DOWNLOAD_OPTIONS = [
   { key: 'image', label: 'Image (PNG)',       ext: '.png',  icon: Image   },
 ]
 
-function DownloadMenu({ form, logo, className }) {
+function DownloadMenu({ form, logo, className, onMobileHint }) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(null)
   const ref = useRef(null)
@@ -57,6 +148,7 @@ function DownloadMenu({ form, logo, className }) {
       if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
       if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
       if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
+      if (isMobileDevice()) onMobileHint?.(key)
     } finally {
       setBusy(null)
     }
@@ -98,7 +190,7 @@ function DownloadMenu({ form, logo, className }) {
   )
 }
 
-function DownloadMenuFull({ form, logo }) {
+function DownloadMenuFull({ form, logo, onMobileHint }) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(null)
   const ref = useRef(null)
@@ -118,6 +210,7 @@ function DownloadMenuFull({ form, logo }) {
       if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
       if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
       if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
+      if (isMobileDevice()) onMobileHint?.(key)
     } finally {
       setBusy(null)
     }
@@ -202,11 +295,12 @@ function ScaledPreview({ form, logo }) {
 export default function App() {
   const [form, setForm] = useState(initialForm)
   const [logo, setLogo] = useState(null)
-  const [formPct, setFormPct] = useState(0.4)   // 40% form / 60% preview
+  const [formPct, setFormPct] = useState(0.4)
   const [resizing, setResizing] = useState(false)
   const [showMobilePreview, setShowMobilePreview] = useState(false)
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024)
-  const [privacyPhase, setPrivacyPhase] = useState('hidden') // hidden | enter | exit | gone
+  const [privacyPhase, setPrivacyPhase] = useState('hidden')
+  const [mobileHint, setMobileHint] = useState(null) // null | 'pdf' | 'image' | 'docx'
   const containerRef = useRef(null)
 
   const handlePrint = () => window.print()
@@ -269,7 +363,7 @@ export default function App() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <DownloadMenu form={form} logo={logo} />
+            <DownloadMenu form={form} logo={logo} onMobileHint={setMobileHint} />
 
             <Button
               variant="outline"
@@ -314,7 +408,7 @@ export default function App() {
 
             {/* Bottom actions */}
             <div className="mt-8 pt-6 border-t space-y-2">
-              <DownloadMenuFull form={form} logo={logo} />
+              <DownloadMenuFull form={form} logo={logo} onMobileHint={setMobileHint} />
               <Button
                 variant="outline"
                 className="w-full gap-2 font-medium"
@@ -372,6 +466,9 @@ export default function App() {
           <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
         </div>
       </footer>
+
+      {/* Mobile download hint sheet */}
+      <MobileDownloadHint format={mobileHint} onClose={() => setMobileHint(null)} />
 
       {/* Mobile preview bottom sheet */}
       {showMobilePreview && (
