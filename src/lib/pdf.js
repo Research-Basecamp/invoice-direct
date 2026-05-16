@@ -8,22 +8,38 @@ function isMobile() {
 }
 
 export async function downloadPDF(form, logo, invoiceNumber) {
+  const filename = `invoice-${invoiceNumber || 'draft'}.pdf`
+
   if (isMobile()) {
-    // html2canvas + iframe is unreliable on mobile browsers.
-    // Open the invoice HTML directly — the browser renders it perfectly and
-    // the user can tap Share → Print → Save as PDF (iOS) or use the
-    // browser menu to download/print (Android).
-    const html = generateInvoiceHTML(form, logo)
-    const blob = new Blob([html], { type: 'text/html' })
-    const url = URL.createObjectURL(blob)
-    window.open(url, '_blank')
-    setTimeout(() => URL.revokeObjectURL(url), 60000)
+    try {
+      const canvas = await captureInvoiceToCanvas(form, logo)
+      const pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' })
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 612, 792)
+      const blob = pdf.output('blob')
+      const file = new File([blob], filename, { type: 'application/pdf' })
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: filename })
+        return
+      }
+      // Share API unavailable (older Android) — try direct blob download
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = filename
+      document.body.appendChild(a); a.click(); document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(url), 5000)
+    } catch {
+      // canvas capture failed — open invoice HTML so user can print to PDF
+      const blob = new Blob([generateInvoiceHTML(form, logo)], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      window.open(url, '_blank')
+      setTimeout(() => URL.revokeObjectURL(url), 60000)
+    }
     return
   }
 
-  // Desktop: direct PDF download via html2canvas + jsPDF
+  // Desktop: direct PDF download
   const canvas = await captureInvoiceToCanvas(form, logo)
   const pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' })
   pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 612, 792)
-  pdf.save(`invoice-${invoiceNumber || 'draft'}.pdf`)
+  pdf.save(filename)
 }

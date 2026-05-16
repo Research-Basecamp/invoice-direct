@@ -7,22 +7,35 @@ function isMobile() {
 }
 
 export async function downloadImage(form, logo, invoiceNumber) {
+  const filename = `invoice-${invoiceNumber || 'draft'}.png`
+
   if (isMobile()) {
-    // html2canvas is unreliable on mobile. Open the invoice as an HTML page —
-    // on iOS the user can long-press the page and "Add to Photos" after using
-    // the browser's built-in screenshot, or use Share → Save to Files.
-    const html = generateInvoiceHTML(form, logo)
-    const blob = new Blob([html], { type: 'text/html' })
-    const url = URL.createObjectURL(blob)
-    window.open(url, '_blank')
-    setTimeout(() => URL.revokeObjectURL(url), 60000)
+    try {
+      const canvas = await captureInvoiceToCanvas(form, logo)
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+      const file = new File([blob], filename, { type: 'image/png' })
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: filename })
+        return
+      }
+      // Share API unavailable — open PNG blob in new tab (user can long-press save)
+      const url = URL.createObjectURL(blob)
+      window.open(url, '_blank')
+      setTimeout(() => URL.revokeObjectURL(url), 60000)
+    } catch {
+      // canvas capture failed — open invoice HTML as fallback
+      const blob = new Blob([generateInvoiceHTML(form, logo)], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      window.open(url, '_blank')
+      setTimeout(() => URL.revokeObjectURL(url), 60000)
+    }
     return
   }
 
   // Desktop: direct PNG download
   const canvas = await captureInvoiceToCanvas(form, logo)
   const link = document.createElement('a')
-  link.download = `invoice-${invoiceNumber || 'draft'}.png`
+  link.download = filename
   link.href = canvas.toDataURL('image/png')
   link.click()
 }
