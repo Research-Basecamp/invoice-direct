@@ -1,4 +1,5 @@
 import { captureInvoiceToCanvas } from './capture'
+import { generateInvoiceHTML } from './invoice-html'
 
 function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
@@ -6,29 +7,22 @@ function isMobile() {
 }
 
 export async function downloadImage(form, logo, invoiceNumber) {
-  const filename = `invoice-${invoiceNumber || 'draft'}.png`
-
-  // Pre-open window synchronously while we still have the user gesture (iOS).
-  const preWin = isMobile() ? window.open('', '_blank') : null
-
-  try {
-    const canvas = await captureInvoiceToCanvas(form, logo)
-
-    if (preWin) {
-      // Use a blob URL — data URLs can be too large for mobile window navigation
-      canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob)
-        preWin.location.href = url
-        setTimeout(() => URL.revokeObjectURL(url), 60000)
-      }, 'image/png')
-    } else {
-      const link = document.createElement('a')
-      link.download = filename
-      link.href = canvas.toDataURL('image/png')
-      link.click()
-    }
-  } catch (err) {
-    if (preWin) preWin.close()
-    throw err
+  if (isMobile()) {
+    // html2canvas is unreliable on mobile. Open the invoice as an HTML page —
+    // on iOS the user can long-press the page and "Add to Photos" after using
+    // the browser's built-in screenshot, or use Share → Save to Files.
+    const html = generateInvoiceHTML(form, logo)
+    const blob = new Blob([html], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank')
+    setTimeout(() => URL.revokeObjectURL(url), 60000)
+    return
   }
+
+  // Desktop: direct PNG download
+  const canvas = await captureInvoiceToCanvas(form, logo)
+  const link = document.createElement('a')
+  link.download = `invoice-${invoiceNumber || 'draft'}.png`
+  link.href = canvas.toDataURL('image/png')
+  link.click()
 }

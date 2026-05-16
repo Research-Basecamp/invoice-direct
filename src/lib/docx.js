@@ -247,20 +247,31 @@ export async function downloadDOCX(form, logo, invoiceNumber) {
   })
 
   const blob = await Packer.toBlob(doc)
-  const url = URL.createObjectURL(blob)
   const filename = `invoice-${invoiceNumber || 'draft'}.docx`
-  // On mobile the blob URL must be opened in a new tab — programmatic link.click()
-  // is blocked on iOS after async work loses the user-gesture context.
   const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
     ('ontouchstart' in window && navigator.maxTouchPoints > 0)
+
   if (mobile) {
+    // Use the Web Share API on mobile — triggers the native share sheet so
+    // the user can save to Files, email, etc.
+    const file = new File([blob], filename, {
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    })
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename })
+      return
+    }
+    // Fallback: open as blob URL (works on Android Chrome)
+    const url = URL.createObjectURL(blob)
     window.open(url, '_blank')
     setTimeout(() => URL.revokeObjectURL(url), 60000)
-  } else {
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    a.click()
-    URL.revokeObjectURL(url)
+    return
   }
+
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
 }
