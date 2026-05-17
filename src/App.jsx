@@ -15,7 +15,7 @@ function isMobileDevice() {
 
 const MOBILE_STEPS = {
   pdf:   { icon: '📄', title: 'Save PDF',       steps: ['The share sheet is open', 'Tap <b>Save to Files</b> to save the PDF', 'Or share it directly via email, AirDrop, etc.'] },
-  image: { icon: '🖼️', title: 'Save Image',     steps: ['The share sheet is open', 'Tap <b>Save to Files</b> or <b>Save Image</b>', 'Or share it directly via email, AirDrop, etc.'] },
+  image: { icon: '🖼️', title: 'Save Image',     steps: ['The share sheet is open', 'Tap <b>Save Image</b> to save directly to your Photos / Gallery', 'Or tap <b>Save to Files</b> to keep it as a PNG file'] },
   docx:  { icon: '📝', title: 'Save Word File', steps: ['The share sheet is open', 'Tap <b>Save to Files</b> or open in <b>Word / Pages</b>', 'On Android it downloads to your Downloads folder'] },
 }
 

@@ -1,5 +1,5 @@
 import { captureInvoiceToCanvas } from './capture'
-import { generatePDFBlob } from './pdf-text'
+import { generateInvoiceCanvas } from './canvas-invoice'
 
 function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
@@ -10,12 +10,12 @@ export async function downloadImage(form, logo, invoiceNumber) {
   const filename = `invoice-${invoiceNumber || 'draft'}.png`
 
   if (isMobile()) {
-    // html2canvas is too slow on mobile — iOS gesture expires before share.
-    // Share as PDF instead (same content, native Save to Files experience).
-    const pdfFilename = `invoice-${invoiceNumber || 'draft'}.pdf`
-    const blob = await generatePDFBlob(form, logo)
-    const file = new File([blob], pdfFilename, { type: 'application/pdf' })
-    await navigator.share({ files: [file], title: pdfFilename })
+    // Canvas 2D API — no html2canvas, runs in ~10ms so the iOS gesture stays valid.
+    // Sharing as PNG lets iOS show "Save Image" → Photos and Android save to Gallery.
+    const canvas = await generateInvoiceCanvas(form, logo)
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'))
+    const file = new File([blob], filename, { type: 'image/png' })
+    await navigator.share({ files: [file], title: filename })
     return
   }
 
