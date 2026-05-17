@@ -156,14 +156,12 @@ export async function generateInvoiceCanvas(form, logo) {
   if (form.notes || form.paymentTerms) {
     y += 26; hline(y); y += 16
     const colW = form.notes && form.paymentTerms ? CW / 2 - 12 : CW
-    let notesBottomY = y
 
     if (form.notes) {
       fnt(9, true); clr('#9CA3AF'); txt('NOTES', ML, y)
       let ny = y + 13
       fnt(11, false); clr('#555555')
       wrap(form.notes, colW).forEach(l => { txt(l, ML, ny); ny += 14 })
-      notesBottomY = ny
     }
     if (form.paymentTerms) {
       const ptX = form.notes ? MID : ML
