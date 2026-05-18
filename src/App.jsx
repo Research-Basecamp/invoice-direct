@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import InvoiceForm from '@/components/invoice/InvoiceForm'
 import InvoicePreview from '@/components/invoice/InvoicePreview'
 import { Button } from '@/components/ui/button'
@@ -388,9 +389,9 @@ export default function App() {
 
           {/* Nav links — desktop only */}
           <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#how-it-works" className="hover:text-foreground transition-colors">How it works</a>
-            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-            <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+            <Link to="/how-it-works" className="hover:text-foreground transition-colors">How it works</Link>
+            <Link to="/features"     className="hover:text-foreground transition-colors">Features</Link>
+            <Link to="/faq"          className="hover:text-foreground transition-colors">FAQ</Link>
           </nav>
 
           {/* Actions */}
@@ -491,101 +492,19 @@ export default function App() {
         </div>
       )}
 
-      {/* ── Content sections (SEO) ───────────────────────────────────────── */}
-      <div className="no-print bg-background">
-
-        <section id="how-it-works" className="max-w-4xl mx-auto px-4 sm:px-6 py-16 border-t">
-          <h2 className="text-2xl font-bold mb-1">How it works</h2>
-          <p className="text-muted-foreground text-sm mb-10">Create a professional invoice in under a minute — no account needed.</p>
-          <div className="grid sm:grid-cols-3 gap-8">
-            {[
-              { n: '1', title: 'Fill in your details', body: 'Enter your business info, client details, invoice items, tax, and discount.' },
-              { n: '2', title: 'Preview instantly',   body: 'See a live preview update as you type — no page reloads, no waiting.' },
-              { n: '3', title: 'Download free',       body: 'Save as PDF, Word document, or PNG image. No account or sign-up needed.' },
-            ].map(({ n, title, body }) => (
-              <div key={n} className="flex gap-4">
-                <div className="shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center">{n}</div>
-                <div>
-                  <h3 className="font-semibold mb-1">{title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="features" className="max-w-4xl mx-auto px-4 sm:px-6 py-16 border-t">
-          <h2 className="text-2xl font-bold mb-1">Features</h2>
-          <p className="text-muted-foreground text-sm mb-10">Everything you need to create and send professional invoices.</p>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {[
-              'Completely free — no sign-up, no subscription',
-              'Works on mobile and desktop',
-              'Download as PDF, Word (.docx), or PNG image',
-              'Your data never leaves your device',
-              'Add your company logo with size control',
-              '30+ currencies supported',
-              'Tax, discount & delivery / shipping fields',
-              'Auto-saves your business details for next time',
-              'Print directly from the browser',
-              'Live invoice preview as you type',
-            ].map(feat => (
-              <div key={feat} className="flex items-start gap-2 text-sm">
-                <span className="text-green-500 mt-0.5 shrink-0 font-bold">✓</span>
-                <span>{feat}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="faq" className="max-w-4xl mx-auto px-4 sm:px-6 py-16 border-t">
-          <h2 className="text-2xl font-bold mb-1">Frequently asked questions</h2>
-          <p className="text-muted-foreground text-sm mb-10">Common questions about Invoice In Minute.</p>
-          <div className="space-y-6">
-            {[
-              { q: 'Is Invoice In Minute really free?',    a: 'Yes, completely free. No account required, no subscription, no hidden fees — ever.' },
-              { q: 'Is my invoice data secure?',           a: 'Your data never leaves your browser. Nothing is uploaded or stored on any server. All processing happens locally on your device.' },
-              { q: 'Can I use it on my phone?',            a: 'Yes. It works on iOS and Android. You can save the invoice as a PDF to Files or as a PNG image directly to your photo gallery.' },
-              { q: 'What file formats can I download?',    a: 'PDF document, Word file (.docx), and PNG image. All formats are generated in your browser — no server involved.' },
-              { q: 'Does it support my currency?',         a: '30+ currencies are supported including USD, EUR, GBP, AUD, CAD, INR, JPY, AED and more.' },
-              { q: 'Can I add my company logo?',           a: 'Yes. Upload your logo and adjust its size with the slider. It appears on all downloaded formats — PDF, Word, and PNG.' },
-              { q: 'Will my details be remembered?',       a: 'Yes. Your business name, contact details, currency, and logo are saved in your browser and pre-filled next time you visit.' },
-            ].map(({ q, a }) => (
-              <div key={q} className="border-b pb-6 last:border-0">
-                <h3 className="font-semibold mb-1.5">{q}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{a}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
       {/* Footer */}
-      <footer className="no-print border-t bg-background py-8 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary text-primary-foreground">
-                <FileText className="h-3.5 w-3.5" />
-              </div>
-              <div>
-                <p className="font-bold text-sm tracking-tight">Invoice In Minute</p>
-                <p className="text-[10px] text-muted-foreground">Free online invoice generator</p>
-              </div>
-            </div>
-            <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              <a href="#how-it-works" className="hover:text-foreground transition-colors">How it works</a>
-              <a href="#features"     className="hover:text-foreground transition-colors">Features</a>
-              <a href="#faq"          className="hover:text-foreground transition-colors">FAQ</a>
-            </nav>
+      <footer className="no-print border-t bg-background py-6 px-4 sm:px-6">
+        <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-green-500" />
+            <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
           </div>
-          <div className="pt-4 border-t flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-green-500" />
-              <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
-            </div>
+          <nav className="flex items-center gap-5 text-xs text-muted-foreground">
+            <Link to="/how-it-works" className="hover:text-foreground transition-colors">How it works</Link>
+            <Link to="/features"     className="hover:text-foreground transition-colors">Features</Link>
+            <Link to="/faq"          className="hover:text-foreground transition-colors">FAQ</Link>
             <span>© {new Date().getFullYear()} Invoice In Minute</span>
-          </div>
+          </nav>
         </div>
       </footer>
 
