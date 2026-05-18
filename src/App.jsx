@@ -79,6 +79,17 @@ function MobileSaveModal({ pending, onClose }) {
   )
 }
 
+const SENDER_KEYS = ['fromCompany', 'fromName', 'fromEmail', 'fromPhone', 'fromAddress', 'currency']
+const LS_SENDER = 'iim_sender'
+const LS_LOGO   = 'iim_logo'
+
+function loadSender() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS_SENDER) || '{}')
+    return Object.fromEntries(SENDER_KEYS.filter(k => k in saved).map(k => [k, saved[k]]))
+  } catch { return {} }
+}
+
 const initialForm = {
   fromCompany: '',
   fromName: '',
@@ -100,6 +111,7 @@ const initialForm = {
   delivery: '',
   notes: '',
   paymentTerms: '',
+  ...loadSender(),
 }
 
 const DOWNLOAD_OPTIONS = [
@@ -290,7 +302,7 @@ function ScaledPreview({ form, logo }) {
 
 export default function App() {
   const [form, setForm] = useState(initialForm)
-  const [logo, setLogo] = useState(null)
+  const [logo, setLogo] = useState(() => { try { return localStorage.getItem(LS_LOGO) || null } catch { return null } })
   const [formPct, setFormPct] = useState(0.4)
   const [resizing, setResizing] = useState(false)
   const [showMobilePreview, setShowMobilePreview] = useState(false)
@@ -341,6 +353,21 @@ export default function App() {
     const goneTimer  = setTimeout(() => setPrivacyPhase('gone'),  8000)
     return () => { clearTimeout(enterTimer); clearTimeout(exitTimer); clearTimeout(goneTimer) }
   }, [])
+
+  // Persist sender fields (From section + currency) to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_SENDER, JSON.stringify(Object.fromEntries(SENDER_KEYS.map(k => [k, form[k]]))))
+    } catch {}
+  }, [form.fromCompany, form.fromName, form.fromEmail, form.fromPhone, form.fromAddress, form.currency])
+
+  // Persist logo to localStorage
+  useEffect(() => {
+    try {
+      if (logo) localStorage.setItem(LS_LOGO, logo)
+      else localStorage.removeItem(LS_LOGO)
+    } catch {}
+  }, [logo])
 
   return (
     <div className="min-h-screen bg-muted/30">
