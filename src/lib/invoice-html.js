@@ -31,7 +31,7 @@ export const INVOICE_STYLES = `
     align-items: flex-start;
     margin-bottom: 40px;
   }
-  .logo { height: 52px; width: auto; max-width: 160px; object-fit: contain; margin-bottom: 10px; display: block; }
+  .logo { width: auto; object-fit: contain; margin-bottom: 10px; display: block; }
   h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; color: #111; }
   .meta { text-align: right; }
   .invoice-num { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 4px; }
@@ -105,7 +105,7 @@ export function renderInvoiceContent(form, logo) {
   <div class="page">
     <div class="header">
       <div>
-        ${logo ? `<img src="${logo}" class="logo" alt="Logo">` : ''}
+        ${logo ? `<img src="${logo}" class="logo" alt="Logo" style="height:${Math.round(52 * (form.logoScale || 1))}px;max-width:${Math.round(160 * (form.logoScale || 1))}px">` : ''}
         <h1>INVOICE</h1>
       </div>
       <div class="meta">

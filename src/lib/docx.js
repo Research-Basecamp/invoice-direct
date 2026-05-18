@@ -86,7 +86,8 @@ export async function generateDocxBlob(form, logo) {
   const deliveryAmt = parseFloat(form.delivery) || 0
   const total       = afterDisc + taxAmt + deliveryAmt
 
-  const logoRun = logo ? await loadLogo(logo) : null
+  const ls = form.logoScale || 1
+  const logoRun = logo ? await loadLogo(logo, 130 * ls, 65 * ls) : null
 
   // ── 1. Header ──────────────────────────────────────────────────────────────
   const headerTable = new Table({

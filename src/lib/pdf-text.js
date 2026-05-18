@@ -47,7 +47,8 @@ export async function generatePDFBlob(form, logo) {
   // ── logo ────────────────────────────────────────────────────────────
   let logoH = 0
   if (logo) {
-    const dims = await logoSize(logo)
+    const ls = form.logoScale || 1
+    const dims = await logoSize(logo, 120 * ls, 60 * ls)
     if (dims) {
       doc.addImage(logo, ML, y, dims.w, dims.h)
       logoH = dims.h + 10

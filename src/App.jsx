@@ -79,7 +79,7 @@ function MobileSaveModal({ pending, onClose }) {
   )
 }
 
-const SENDER_KEYS = ['fromCompany', 'fromName', 'fromEmail', 'fromPhone', 'fromAddress', 'currency']
+const SENDER_KEYS = ['fromCompany', 'fromName', 'fromEmail', 'fromPhone', 'fromAddress', 'currency', 'logoScale']
 const LS_SENDER = 'iim_sender'
 const LS_LOGO   = 'iim_logo'
 
@@ -105,6 +105,7 @@ const initialForm = {
   date: new Date().toISOString().split('T')[0],
   dueDate: '',
   currency: 'USD',
+  logoScale: 1,
   items: [{ description: '', quantity: 0, rate: 0 }],
   taxRate: '',
   discountRate: '',

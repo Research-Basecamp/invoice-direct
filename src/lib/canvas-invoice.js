@@ -63,7 +63,8 @@ export async function generateInvoiceCanvas(form, logo) {
   if (logo) {
     const img = await loadImg(logo)
     if (img) {
-      const s  = Math.min(140 / img.naturalWidth, 70 / img.naturalHeight, 1)
+      const ls = form.logoScale || 1
+      const s  = Math.min(140 / img.naturalWidth, 70 / img.naturalHeight, 1) * ls
       const lw = img.naturalWidth * s, lh = img.naturalHeight * s
       ctx.drawImage(img, ML, y, lw, lh)
       logoH = lh + 14

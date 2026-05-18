@@ -156,15 +156,32 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
                 <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Optional</span>
               </div>
               {logo ? (
-                <div className="relative inline-block">
-                  <img src={logo} alt="Logo" className="h-20 w-20 object-contain rounded-lg border" />
-                  <button
-                    type="button"
-                    onClick={() => setLogo(null)}
-                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs leading-none flex items-center justify-center"
-                  >
-                    ×
-                  </button>
+                <div className="flex items-start gap-4">
+                  <div className="relative shrink-0">
+                    <img src={logo} alt="Logo" className="h-20 w-20 object-contain rounded-lg border" />
+                    <button
+                      type="button"
+                      onClick={() => setLogo(null)}
+                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs leading-none flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <div className="space-y-1 pt-1">
+                    <Label className="text-xs text-muted-foreground">Logo Size</Label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min="50" max="200" step="5"
+                        value={Math.round((form.logoScale || 1) * 100)}
+                        onChange={(e) => updateField('logoScale', parseInt(e.target.value) / 100)}
+                        className="w-24 accent-primary"
+                      />
+                      <span className="text-xs text-muted-foreground tabular-nums w-9">
+                        {Math.round((form.logoScale || 1) * 100)}%
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <>
