@@ -1,5 +1,6 @@
 import { captureInvoiceToCanvas } from './capture'
 import { generateInvoiceCanvas } from './canvas-invoice'
+import { invoiceFilename } from './utils'
 
 export async function generatePNGBlob(form, logo) {
   const canvas = await generateInvoiceCanvas(form, logo)
@@ -11,8 +12,8 @@ function isMobile() {
     ('ontouchstart' in window && navigator.maxTouchPoints > 0)
 }
 
-export async function downloadImage(form, logo, invoiceNumber) {
-  const filename = `invoice-${invoiceNumber || 'draft'}.png`
+export async function downloadImage(form, logo) {
+  const filename = `${invoiceFilename(form)}.png`
 
   if (isMobile()) {
     // Canvas 2D API — no html2canvas, runs in ~10ms so the iOS gesture stays valid.

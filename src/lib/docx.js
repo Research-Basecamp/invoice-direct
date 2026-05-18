@@ -2,7 +2,7 @@ import {
   Document, Packer, Paragraph, Table, TableRow, TableCell,
   TextRun, WidthType, AlignmentType, BorderStyle, ImageRun,
 } from 'docx'
-import { formatCurrency, formatDate, displayAddress } from './utils'
+import { formatCurrency, formatDate, displayAddress, invoiceFilename } from './utils'
 
 // Letter paper: 12240 DXA wide. Margins left+right = 900+900 = 1800.
 // Content width = 12240 - 1800 = 10440 DXA
@@ -249,9 +249,9 @@ export async function generateDocxBlob(form, logo) {
   return Packer.toBlob(doc)
 }
 
-export async function downloadDOCX(form, logo, invoiceNumber) {
+export async function downloadDOCX(form, logo) {
   const blob = await generateDocxBlob(form, logo)
-  const filename = `invoice-${invoiceNumber || 'draft'}.docx`
+  const filename = `${invoiceFilename(form)}.docx`
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

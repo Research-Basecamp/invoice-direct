@@ -7,6 +7,7 @@ import { downloadPDF } from '@/lib/pdf'
 import { downloadDOCX, generateDocxBlob } from '@/lib/docx'
 import { downloadImage, generatePNGBlob } from '@/lib/image'
 import { generatePDFBlob } from '@/lib/pdf-text'
+import { invoiceFilename } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
 function isMobileDevice() {
@@ -125,16 +126,16 @@ function DownloadMenu({ form, logo, className, onMobileDownload }) {
     setBusy(key)
     try {
       if (isMobileDevice()) {
-        const base = `invoice-${form.invoiceNumber || 'draft'}`
+        const base = invoiceFilename(form)
         let blob, filename
         if (key === 'pdf')   { blob = await generatePDFBlob(form, logo);  filename = `${base}.pdf`  }
         if (key === 'image') { blob = await generatePNGBlob(form, logo);  filename = `${base}.png`  }
         if (key === 'docx')  { blob = await generateDocxBlob(form, logo); filename = `${base}.docx` }
         if (blob) onMobileDownload?.(key, blob, filename)
       } else {
-        if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
-        if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
-        if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
+        if (key === 'pdf')   await downloadPDF(form, logo)
+        if (key === 'docx')  await downloadDOCX(form, logo)
+        if (key === 'image') await downloadImage(form, logo)
       }
     } finally {
       setBusy(null)
@@ -195,16 +196,16 @@ function DownloadMenuFull({ form, logo, onMobileDownload }) {
     setBusy(key)
     try {
       if (isMobileDevice()) {
-        const base = `invoice-${form.invoiceNumber || 'draft'}`
+        const base = invoiceFilename(form)
         let blob, filename
         if (key === 'pdf')   { blob = await generatePDFBlob(form, logo);  filename = `${base}.pdf`  }
         if (key === 'image') { blob = await generatePNGBlob(form, logo);  filename = `${base}.png`  }
         if (key === 'docx')  { blob = await generateDocxBlob(form, logo); filename = `${base}.docx` }
         if (blob) onMobileDownload?.(key, blob, filename)
       } else {
-        if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
-        if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
-        if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
+        if (key === 'pdf')   await downloadPDF(form, logo)
+        if (key === 'docx')  await downloadDOCX(form, logo)
+        if (key === 'image') await downloadImage(form, logo)
       }
     } finally {
       setBusy(null)

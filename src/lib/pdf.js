@@ -1,14 +1,15 @@
 import { jsPDF } from 'jspdf'
 import { captureInvoiceToCanvas } from './capture'
 import { generatePDFBlob } from './pdf-text'
+import { invoiceFilename } from './utils'
 
 function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
     ('ontouchstart' in window && navigator.maxTouchPoints > 0)
 }
 
-export async function downloadPDF(form, logo, invoiceNumber) {
-  const filename = `invoice-${invoiceNumber || 'draft'}.pdf`
+export async function downloadPDF(form, logo) {
+  const filename = `${invoiceFilename(form)}.pdf`
 
   if (isMobile()) {
     // Use text-based jsPDF — no html2canvas, runs in milliseconds so the

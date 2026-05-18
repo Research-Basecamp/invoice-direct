@@ -52,6 +52,12 @@ export function displayAddress(addr) {
   return remaining ? `${street}\n${remaining}` : street
 }
 
+export function invoiceFilename(form) {
+  const sanitize = (s) => (s || '').trim().replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '')
+  const parts = [sanitize(form.billToCompany), sanitize(form.billToContact)].filter(Boolean)
+  return parts.length ? `invoice-${parts.join('-')}` : 'invoice-draft'
+}
+
 export function formatDate(date) {
   if (!date) return ''
   return new Intl.DateTimeFormat('en-US', {
