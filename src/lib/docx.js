@@ -73,8 +73,8 @@ function addrParagraphs(addrString) {
   return lines.map(l => p(r(l, { size: 20, color: '444444' })))
 }
 
-// ─── Main export ──────────────────────────────────────────────────────────────
-export async function downloadDOCX(form, logo, invoiceNumber) {
+// ─── Blob generator (used by App.jsx mobile path and downloadDOCX) ───────────
+export async function generateDocxBlob(form, logo) {
   const currency = form.currency || 'USD'
   const fmt = (n) => formatCurrency(n, currency)
 
@@ -246,28 +246,12 @@ export async function downloadDOCX(form, logo, invoiceNumber) {
     }],
   })
 
-  const blob = await Packer.toBlob(doc)
+  return Packer.toBlob(doc)
+}
+
+export async function downloadDOCX(form, logo, invoiceNumber) {
+  const blob = await generateDocxBlob(form, logo)
   const filename = `invoice-${invoiceNumber || 'draft'}.docx`
-  const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-    ('ontouchstart' in window && navigator.maxTouchPoints > 0)
-
-  if (mobile) {
-    // Use the Web Share API on mobile — triggers the native share sheet so
-    // the user can save to Files, email, etc.
-    const file = new File([blob], filename, {
-      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    })
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename })
-      return
-    }
-    // Fallback: open as blob URL (works on Android Chrome)
-    const url = URL.createObjectURL(blob)
-    window.open(url, '_blank')
-    setTimeout(() => URL.revokeObjectURL(url), 60000)
-    return
-  }
-
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

@@ -4,8 +4,9 @@ import InvoicePreview from '@/components/invoice/InvoicePreview'
 import { Button } from '@/components/ui/button'
 import { Printer, Download, FileText, Eye, ArrowLeft, X, ChevronDown, Image, ShieldCheck } from 'lucide-react'
 import { downloadPDF } from '@/lib/pdf'
-import { downloadDOCX } from '@/lib/docx'
-import { downloadImage } from '@/lib/image'
+import { downloadDOCX, generateDocxBlob } from '@/lib/docx'
+import { downloadImage, generatePNGBlob } from '@/lib/image'
+import { generatePDFBlob } from '@/lib/pdf-text'
 import { cn } from '@/lib/utils'
 
 function isMobileDevice() {
@@ -13,15 +14,32 @@ function isMobileDevice() {
     ('ontouchstart' in window && navigator.maxTouchPoints > 0)
 }
 
-const MOBILE_STEPS = {
-  pdf:   { icon: '📄', title: 'Save PDF',       steps: ['The share sheet is open', 'Tap <b>Save to Files</b> to save the PDF', 'Or share it directly via email, AirDrop, etc.'] },
-  image: { icon: '🖼️', title: 'Save Image',     steps: ['The share sheet is open', 'Tap <b>Save Image</b> to save directly to your Photos / Gallery', 'Or tap <b>Save to Files</b> to keep it as a PNG file'] },
-  docx:  { icon: '📝', title: 'Save Word File', steps: ['The share sheet is open', 'Tap <b>Save to Files</b> or open in <b>Word / Pages</b>', 'On Android it downloads to your Downloads folder'] },
+const SAVE_CONFIGS = {
+  image: { icon: '🖼️', title: 'Invoice Image Ready', label: 'PNG Image',    buttonText: 'Save to Gallery',  hint: 'Tap "Save Image" in the share sheet',          mimeType: 'image/png' },
+  pdf:   { icon: '📄', title: 'Invoice PDF Ready',   label: 'PDF Document', buttonText: 'Save PDF',          hint: 'Tap "Save to Files" in the share sheet',       mimeType: 'application/pdf' },
+  docx:  { icon: '📝', title: 'Word File Ready',     label: 'Word Document',buttonText: 'Save Word File',    hint: 'Tap "Save to Files" or open in Word / Pages',  mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
 }
 
-function MobileDownloadHint({ format, onClose }) {
-  if (!format) return null
-  const { icon, title, steps } = MOBILE_STEPS[format]
+function MobileSaveModal({ pending, onClose }) {
+  if (!pending) return null
+  const cfg = SAVE_CONFIGS[pending.type]
+  const sizeKB = pending.blob ? (pending.blob.size / 1024).toFixed(0) : '?'
+
+  const handleSave = async () => {
+    const file = new File([pending.blob], pending.filename, { type: cfg.mimeType })
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: pending.filename })
+      } else {
+        const url = URL.createObjectURL(pending.blob)
+        window.open(url, '_blank')
+        setTimeout(() => URL.revokeObjectURL(url), 60000)
+      }
+    } catch (e) {
+      if (e.name !== 'AbortError') console.error(e)
+    }
+    onClose()
+  }
 
   return (
     <div className="lg:hidden no-print fixed inset-0 z-[70] flex flex-col justify-end">
@@ -30,29 +48,30 @@ function MobileDownloadHint({ format, onClose }) {
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-10 h-1.5 rounded-full bg-muted-foreground/25" />
         </div>
-        <div className="px-5 pb-8 pt-2">
+        <div className="px-5 pb-8 pt-3">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <span className="text-3xl">{icon}</span>
-              <p className="font-semibold text-base">{title}</p>
+              <span className="text-2xl">{cfg.icon}</span>
+              <p className="font-semibold text-base">{cfg.title}</p>
             </div>
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
               <X className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="space-y-3 mb-6">
-            {steps.map((step, i) => (
-              <div key={i} className="flex gap-3 items-start">
-                <span className="shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center mt-0.5">
-                  {i + 1}
-                </span>
-                <p className="text-sm text-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: step }} />
-              </div>
-            ))}
+          <div className="bg-muted/50 rounded-xl p-3.5 mb-5 flex items-center gap-3">
+            <span className="text-xl">{cfg.icon}</span>
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate">{pending.filename}</p>
+              <p className="text-xs text-muted-foreground">{cfg.label} · {sizeKB} KB</p>
+            </div>
           </div>
 
-          <Button className="w-full" onClick={onClose}>Got it</Button>
+          <Button className="w-full gap-2 mb-2" size="lg" onClick={handleSave}>
+            {cfg.buttonText}
+          </Button>
+          <p className="text-center text-xs text-muted-foreground mb-4">{cfg.hint}</p>
+          <Button variant="ghost" className="w-full" onClick={onClose}>Cancel</Button>
         </div>
       </div>
     </div>
@@ -88,7 +107,7 @@ const DOWNLOAD_OPTIONS = [
   { key: 'image', label: 'Image (PNG)',       ext: '.png',  icon: Image   },
 ]
 
-function DownloadMenu({ form, logo, className, onMobileHint }) {
+function DownloadMenu({ form, logo, className, onMobileDownload }) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(null)
   const ref = useRef(null)
@@ -105,10 +124,18 @@ function DownloadMenu({ form, logo, className, onMobileHint }) {
     setOpen(false)
     setBusy(key)
     try {
-      if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
-      if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
-      if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
-      if (isMobileDevice()) onMobileHint?.(key)
+      if (isMobileDevice()) {
+        const base = `invoice-${form.invoiceNumber || 'draft'}`
+        let blob, filename
+        if (key === 'pdf')   { blob = await generatePDFBlob(form, logo);  filename = `${base}.pdf`  }
+        if (key === 'image') { blob = await generatePNGBlob(form, logo);  filename = `${base}.png`  }
+        if (key === 'docx')  { blob = await generateDocxBlob(form, logo); filename = `${base}.docx` }
+        if (blob) onMobileDownload?.(key, blob, filename)
+      } else {
+        if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
+        if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
+        if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
+      }
     } finally {
       setBusy(null)
     }
@@ -150,7 +177,7 @@ function DownloadMenu({ form, logo, className, onMobileHint }) {
   )
 }
 
-function DownloadMenuFull({ form, logo, onMobileHint }) {
+function DownloadMenuFull({ form, logo, onMobileDownload }) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(null)
   const ref = useRef(null)
@@ -167,10 +194,18 @@ function DownloadMenuFull({ form, logo, onMobileHint }) {
     setOpen(false)
     setBusy(key)
     try {
-      if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
-      if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
-      if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
-      if (isMobileDevice()) onMobileHint?.(key)
+      if (isMobileDevice()) {
+        const base = `invoice-${form.invoiceNumber || 'draft'}`
+        let blob, filename
+        if (key === 'pdf')   { blob = await generatePDFBlob(form, logo);  filename = `${base}.pdf`  }
+        if (key === 'image') { blob = await generatePNGBlob(form, logo);  filename = `${base}.png`  }
+        if (key === 'docx')  { blob = await generateDocxBlob(form, logo); filename = `${base}.docx` }
+        if (blob) onMobileDownload?.(key, blob, filename)
+      } else {
+        if (key === 'pdf')   await downloadPDF(form, logo, form.invoiceNumber)
+        if (key === 'docx')  await downloadDOCX(form, logo, form.invoiceNumber)
+        if (key === 'image') await downloadImage(form, logo, form.invoiceNumber)
+      }
     } finally {
       setBusy(null)
     }
@@ -260,7 +295,7 @@ export default function App() {
   const [showMobilePreview, setShowMobilePreview] = useState(false)
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024)
   const [privacyPhase, setPrivacyPhase] = useState('hidden')
-  const [mobileHint, setMobileHint] = useState(null) // null | 'pdf' | 'image' | 'docx'
+  const [pendingShare, setPendingShare] = useState(null) // null | { type, blob, filename }
   const containerRef = useRef(null)
 
   const handlePrint = () => window.print()
@@ -323,7 +358,7 @@ export default function App() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <DownloadMenu form={form} logo={logo} onMobileHint={setMobileHint} />
+            <DownloadMenu form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} />
 
             <Button
               variant="outline"
@@ -368,7 +403,7 @@ export default function App() {
 
             {/* Bottom actions */}
             <div className="mt-8 pt-6 border-t space-y-2">
-              <DownloadMenuFull form={form} logo={logo} onMobileHint={setMobileHint} />
+              <DownloadMenuFull form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} />
               <Button
                 variant="outline"
                 className="w-full gap-2 font-medium"
@@ -427,8 +462,8 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Mobile download hint sheet */}
-      <MobileDownloadHint format={mobileHint} onClose={() => setMobileHint(null)} />
+      {/* Mobile pre-share modal */}
+      <MobileSaveModal pending={pendingShare} onClose={() => setPendingShare(null)} />
 
       {/* Mobile preview bottom sheet */}
       {showMobilePreview && (

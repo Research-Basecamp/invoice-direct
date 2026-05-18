@@ -1,6 +1,11 @@
 import { captureInvoiceToCanvas } from './capture'
 import { generateInvoiceCanvas } from './canvas-invoice'
 
+export async function generatePNGBlob(form, logo) {
+  const canvas = await generateInvoiceCanvas(form, logo)
+  return new Promise(r => canvas.toBlob(r, 'image/png'))
+}
+
 function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
     ('ontouchstart' in window && navigator.maxTouchPoints > 0)
