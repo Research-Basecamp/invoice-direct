@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Select, SelectItem, SelectGroup } from '@/components/ui/select'
 import { AddressInput } from '@/components/ui/address-input'
 import { cn } from '@/lib/utils'
-import { Upload, Plus, Trash2, ImagePlus } from 'lucide-react'
+import { Upload, Plus, Trash2, ImagePlus, ChevronDown, Check } from 'lucide-react'
 
 const CURRENCIES = [
   { group: 'Common', items: [
@@ -46,6 +46,8 @@ const CURRENCIES = [
 const emptyItem = { description: '', quantity: 0, rate: 0 }
 
 export default function InvoiceForm({ form, setForm, logo, setLogo }) {
+  const hasSaved = !!(logo || form.fromCompany || form.fromName || form.fromEmail || form.fromPhone || form.fromAddress)
+  const [senderOpen, setSenderOpen] = useState(!hasSaved)
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef(null)
 
@@ -102,103 +104,149 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
 
   return (
     <div className="space-y-6">
-      {/* Logo */}
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-2">
-          <Label>Company Logo</Label>
-          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Optional</span>
-        </div>
-        {logo ? (
-          <div className="relative inline-block">
-            <img src={logo} alt="Logo" className="h-20 w-20 object-contain rounded-lg border" />
-            <button
-              type="button"
-              onClick={() => setLogo(null)}
-              className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs leading-none flex items-center justify-center"
-            >
-              ×
-            </button>
+
+      {/* ── Your Details (logo / currency / from) — collapsible when saved ── */}
+      <div className="space-y-3">
+        <button
+          type="button"
+          onClick={() => setSenderOpen(v => !v)}
+          className="w-full flex items-center justify-between text-left"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold">Your Details</span>
+            {hasSaved && !senderOpen && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-green-600 bg-green-50 border border-green-200 rounded-full px-2 py-0.5 leading-none">
+                <Check className="h-3 w-3" /> Saved
+              </span>
+            )}
           </div>
-        ) : (
-          <>
-            {/* Desktop: drag-and-drop zone */}
-            <div
-              className={cn(
-                'hidden sm:flex flex-col items-center justify-center gap-1.5 w-48 h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors',
-                isDragging
-                  ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/60 hover:bg-muted/50'
+          <ChevronDown className={cn('h-4 w-4 text-muted-foreground transition-transform duration-200', senderOpen && 'rotate-180')} />
+        </button>
+
+        {/* Collapsed summary card */}
+        {!senderOpen && hasSaved && (
+          <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
+            {logo
+              ? <img src={logo} alt="" className="h-10 w-10 object-contain rounded border bg-white shrink-0" />
+              : <div className="h-10 w-10 rounded border bg-muted shrink-0" />
+            }
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">
+                {[form.fromCompany, form.fromName].filter(Boolean).join(' · ') || 'Your business'}
+              </p>
+              {(form.fromEmail || form.fromPhone) && (
+                <p className="text-xs text-muted-foreground truncate mt-0.5">
+                  {[form.fromEmail, form.fromPhone].filter(Boolean).join(' · ')}
+                </p>
               )}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <ImagePlus className="h-6 w-6" />
-              <p className="text-xs text-center leading-tight">
-                Drag & drop or<br />click to upload
+              <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
+                <Check className="h-3 w-3" /> Stored from your previous entry
               </p>
             </div>
-
-            {/* Mobile: simple button */}
-            <label className="sm:hidden flex items-center gap-2 cursor-pointer w-fit">
-              <div className="flex items-center gap-2 px-3 py-1.5 border rounded-lg text-sm text-muted-foreground hover:bg-muted">
-                <Upload className="h-4 w-4" />
-                Upload Logo
-              </div>
-              <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-            </label>
-
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-          </>
+          </div>
         )}
-      </div>
 
-      {/* Currency */}
-      <div className="space-y-1">
-        <Label>Currency</Label>
-        <Select
-          value={form.currency}
-          onValueChange={(val) => updateField('currency', val)}
-          placeholder="Select currency"
-        >
-          {CURRENCIES.map((group) => (
-            <SelectGroup key={group.group} label={group.group}>
-              {group.items.map((c) => (
-                <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>
-              ))}
-            </SelectGroup>
-          ))}
-        </Select>
-      </div>
+        {/* Expanded fields */}
+        {senderOpen && (
+          <div className="space-y-6">
+            {/* Logo */}
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Label>Company Logo</Label>
+                <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Optional</span>
+              </div>
+              {logo ? (
+                <div className="relative inline-block">
+                  <img src={logo} alt="Logo" className="h-20 w-20 object-contain rounded-lg border" />
+                  <button
+                    type="button"
+                    onClick={() => setLogo(null)}
+                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs leading-none flex items-center justify-center"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Desktop: drag-and-drop zone */}
+                  <div
+                    className={cn(
+                      'hidden sm:flex flex-col items-center justify-center gap-1.5 w-48 h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors',
+                      isDragging
+                        ? 'border-primary bg-primary/5 text-primary'
+                        : 'border-muted-foreground/30 text-muted-foreground hover:border-muted-foreground/60 hover:bg-muted/50'
+                    )}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <ImagePlus className="h-6 w-6" />
+                    <p className="text-xs text-center leading-tight">
+                      Drag & drop or<br />click to upload
+                    </p>
+                  </div>
 
-      <Separator />
+                  {/* Mobile: simple button */}
+                  <label className="sm:hidden flex items-center gap-2 cursor-pointer w-fit">
+                    <div className="flex items-center gap-2 px-3 py-1.5 border rounded-lg text-sm text-muted-foreground hover:bg-muted">
+                      <Upload className="h-4 w-4" />
+                      Upload Logo
+                    </div>
+                    <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                  </label>
 
-      {/* From */}
-      <div>
-        <h3 className="text-sm font-medium mb-2">From</h3>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Label>Company Name <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
-            <Input value={form.fromCompany} onChange={(e) => updateField('fromCompany', e.target.value)} placeholder="Your company" />
+                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                </>
+              )}
+            </div>
+
+            {/* Currency */}
+            <div className="space-y-1">
+              <Label>Currency</Label>
+              <Select
+                value={form.currency}
+                onValueChange={(val) => updateField('currency', val)}
+                placeholder="Select currency"
+              >
+                {CURRENCIES.map((group) => (
+                  <SelectGroup key={group.group} label={group.group}>
+                    {group.items.map((c) => (
+                      <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                ))}
+              </Select>
+            </div>
+
+            {/* From */}
+            <div>
+              <h3 className="text-sm font-medium mb-2">From</h3>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label>Company Name <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+                  <Input value={form.fromCompany} onChange={(e) => updateField('fromCompany', e.target.value)} placeholder="Your company" />
+                </div>
+                <div className="space-y-1">
+                  <Label>Your Name <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+                  <Input value={form.fromName} onChange={(e) => updateField('fromName', e.target.value)} placeholder="Your name" />
+                </div>
+                <div className="space-y-1">
+                  <Label>Email</Label>
+                  <Input value={form.fromEmail} onChange={(e) => updateField('fromEmail', e.target.value)} placeholder="your@email.com" />
+                </div>
+                <div className="space-y-1">
+                  <Label>Phone</Label>
+                  <Input value={form.fromPhone} onChange={(e) => updateField('fromPhone', e.target.value)} placeholder="Your phone" />
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <Label>Address</Label>
+                  <AddressInput value={form.fromAddress} onChange={(val) => updateField('fromAddress', val)} placeholder="Your address" />
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="space-y-1">
-            <Label>Your Name <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
-            <Input value={form.fromName} onChange={(e) => updateField('fromName', e.target.value)} placeholder="Your name" />
-          </div>
-          <div className="space-y-1">
-            <Label>Email</Label>
-            <Input value={form.fromEmail} onChange={(e) => updateField('fromEmail', e.target.value)} placeholder="your@email.com" />
-          </div>
-          <div className="space-y-1">
-            <Label>Phone</Label>
-            <Input value={form.fromPhone} onChange={(e) => updateField('fromPhone', e.target.value)} placeholder="Your phone" />
-          </div>
-          <div className="space-y-1 sm:col-span-2">
-            <Label>Address</Label>
-            <AddressInput value={form.fromAddress} onChange={(val) => updateField('fromAddress', val)} placeholder="Your address" />
-          </div>
-        </div>
+        )}
       </div>
 
       <Separator />
