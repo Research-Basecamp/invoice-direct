@@ -358,7 +358,7 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem(LS_SENDER, JSON.stringify(Object.fromEntries(SENDER_KEYS.map(k => [k, form[k]]))))
-    } catch (_) { /* storage unavailable */ }
+    } catch { /* storage unavailable */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.fromCompany, form.fromName, form.fromEmail, form.fromPhone, form.fromAddress, form.currency])
 
@@ -367,7 +367,7 @@ export default function App() {
     try {
       if (logo) localStorage.setItem(LS_LOGO, logo)
       else localStorage.removeItem(LS_LOGO)
-    } catch (_) { /* storage unavailable */ }
+    } catch { /* storage unavailable */ }
   }, [logo])
 
   return (
