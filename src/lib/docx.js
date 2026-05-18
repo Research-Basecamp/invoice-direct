@@ -99,7 +99,7 @@ export async function generateDocxBlob(form, logo) {
         p(r('INVOICE', { size: 56, bold: true })),
       ], { w: HALF }),
       cell([
-        ...(invoiceNumber ? [p(r(invoiceNumber, { size: 26, bold: true }), AlignmentType.RIGHT)] : []),
+        ...(form.invoiceNumber ? [p(r(form.invoiceNumber, { size: 26, bold: true }), AlignmentType.RIGHT)] : []),
         p(r(`Date: ${formatDate(form.date)}`, { size: 20, color: '555555' }), AlignmentType.RIGHT),
         ...(form.dueDate
           ? [p(r(`Due: ${formatDate(form.dueDate)}`, { size: 20, color: '555555' }), AlignmentType.RIGHT)]
