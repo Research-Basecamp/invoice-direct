@@ -49,7 +49,7 @@ function SupportModal({ open, onClose }) {
         <div className="text-3xl mb-3">☕</div>
         <h2 className="font-bold text-lg mb-2">Thank you for using Invoice In Minute!</h2>
         <p className="text-sm text-foreground/75 leading-relaxed mb-6">
-          This tool stays <strong className="text-foreground font-semibold">free and ad-free</strong> thanks to its generous users. If it saved you time, a small coffee goes a long way.
+          Your invoice is ready ☕ — if this saved you time, a coffee keeps the tool free for everyone.
         </p>
         <a
           href={BMC_URL}
