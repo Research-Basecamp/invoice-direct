@@ -16,31 +16,61 @@ function isMobileDevice() {
     ('ontouchstart' in window && navigator.maxTouchPoints > 0)
 }
 
+const BMC_URL = 'https://buymeacoffee.com/riwajchalise'
+
 const SAVE_CONFIGS = {
   image: { icon: '🖼️', title: 'Invoice Image Ready', label: 'PNG Image',    buttonText: 'Save to Gallery',  hint: 'Tap "Save Image" in the share sheet',          mimeType: 'image/png' },
   pdf:   { icon: '📄', title: 'Invoice PDF Ready',   label: 'PDF Document', buttonText: 'Save PDF',          hint: 'Tap "Save to Files" in the share sheet',       mimeType: 'application/pdf' },
   docx:  { icon: '📝', title: 'Word File Ready',     label: 'Word Document',buttonText: 'Save Word File',    hint: 'Tap "Save to Files" or open in Word / Pages',  mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
 }
 
-function MobileSaveModal({ pending, onClose }) {
+function SupportModal({ open, onClose }) {
+  if (!open) return null
+  return (
+    <div className="no-print fixed inset-0 z-[80] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative bg-background rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+        <div className="text-3xl mb-3">☕</div>
+        <h2 className="font-bold text-base mb-2">Enjoying Invoice In Minute?</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+          This tool is made available ad-free and free of cost because of your generous contribution.
+        </p>
+        <a href={BMC_URL} target="_blank" rel="noopener noreferrer" className="block w-full mb-2">
+          <Button className="w-full gap-2 bg-[#FFDD00] text-[#000000] hover:bg-[#FFDD00]/90 font-semibold border-0">
+            <span>☕</span> Support
+          </Button>
+        </a>
+        <Button variant="ghost" className="w-full text-muted-foreground" onClick={onClose}>
+          Maybe next time
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+function MobileSaveModal({ pending, onClose, onSuccess }) {
   if (!pending) return null
   const cfg = SAVE_CONFIGS[pending.type]
   const sizeKB = pending.blob ? (pending.blob.size / 1024).toFixed(0) : '?'
 
   const handleSave = async () => {
     const file = new File([pending.blob], pending.filename, { type: cfg.mimeType })
+    let shared = false
     try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: pending.filename })
+        shared = true
       } else {
         const url = URL.createObjectURL(pending.blob)
         window.open(url, '_blank')
         setTimeout(() => URL.revokeObjectURL(url), 60000)
+        shared = true
       }
     } catch (e) {
       if (e.name !== 'AbortError') console.error(e)
     }
     onClose()
+    if (shared) onSuccess?.()
   }
 
   return (
@@ -122,7 +152,7 @@ const DOWNLOAD_OPTIONS = [
   { key: 'image', label: 'Image (PNG)',       ext: '.png',  icon: Image   },
 ]
 
-function DownloadMenu({ form, logo, className, onMobileDownload }) {
+function DownloadMenu({ form, logo, className, onMobileDownload, onDownloaded }) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(null)
   const ref = useRef(null)
@@ -150,6 +180,7 @@ function DownloadMenu({ form, logo, className, onMobileDownload }) {
         if (key === 'pdf')   await downloadPDF(form, logo)
         if (key === 'docx')  await downloadDOCX(form, logo)
         if (key === 'image') await downloadImage(form, logo)
+        onDownloaded?.()
       }
     } finally {
       setBusy(null)
@@ -192,7 +223,7 @@ function DownloadMenu({ form, logo, className, onMobileDownload }) {
   )
 }
 
-function DownloadMenuFull({ form, logo, onMobileDownload }) {
+function DownloadMenuFull({ form, logo, onMobileDownload, onDownloaded }) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(null)
   const ref = useRef(null)
@@ -220,6 +251,7 @@ function DownloadMenuFull({ form, logo, onMobileDownload }) {
         if (key === 'pdf')   await downloadPDF(form, logo)
         if (key === 'docx')  await downloadDOCX(form, logo)
         if (key === 'image') await downloadImage(form, logo)
+        onDownloaded?.()
       }
     } finally {
       setBusy(null)
@@ -311,6 +343,7 @@ export default function App() {
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024)
   const [privacyPhase, setPrivacyPhase] = useState('hidden')
   const [pendingShare, setPendingShare] = useState(null) // null | { type, blob, filename }
+  const [showSupportModal, setShowSupportModal] = useState(false)
   const containerRef = useRef(null)
 
   const handlePrint = () => window.print()
@@ -389,7 +422,7 @@ export default function App() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <DownloadMenu form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} />
+            <DownloadMenu form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} onDownloaded={() => setShowSupportModal(true)} />
 
             <Button
               variant="outline"
@@ -401,16 +434,16 @@ export default function App() {
               <span className="hidden sm:inline">Print</span>
             </Button>
 
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 font-medium border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-            >
-              <span>
+            <a href={BMC_URL} target="_blank" rel="noopener noreferrer">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 font-medium border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+              >
                 <span className="heart-beat text-sm">♥</span>
                 <span className="hidden sm:inline">Support</span>
-              </span>
-            </Button>
+              </Button>
+            </a>
           </div>
         </div>
       </header>
@@ -434,7 +467,7 @@ export default function App() {
 
             {/* Bottom actions */}
             <div className="mt-8 pt-6 border-t space-y-2">
-              <DownloadMenuFull form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} />
+              <DownloadMenuFull form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} onDownloaded={() => setShowSupportModal(true)} />
               <Button
                 variant="outline"
                 className="w-full gap-2 font-medium"
@@ -515,7 +548,10 @@ export default function App() {
       </footer>
 
       {/* Mobile pre-share modal */}
-      <MobileSaveModal pending={pendingShare} onClose={() => setPendingShare(null)} />
+      <MobileSaveModal pending={pendingShare} onClose={() => setPendingShare(null)} onSuccess={() => setShowSupportModal(true)} />
+
+      {/* Post-download support modal */}
+      <SupportModal open={showSupportModal} onClose={() => setShowSupportModal(false)} />
 
       {/* Mobile preview bottom sheet */}
       {showMobilePreview && (
