@@ -47,9 +47,9 @@ function SupportModal({ open, onClose }) {
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-background rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
         <div className="text-3xl mb-3">☕</div>
-        <h2 className="font-bold text-lg mb-2">Enjoying Invoice In Minute?</h2>
+        <h2 className="font-bold text-lg mb-2">Thank you for using Invoice In Minute!</h2>
         <p className="text-sm text-foreground/75 leading-relaxed mb-6">
-          This tool is made available <strong className="text-foreground font-semibold">ad-free and free of cost</strong> because of your generous contribution.
+          This tool stays <strong className="text-foreground font-semibold">free and ad-free</strong> thanks to its generous users. If it saved you time, a small coffee goes a long way.
         </p>
         <a
           href={BMC_URL}
