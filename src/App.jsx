@@ -17,6 +17,22 @@ function isMobileDevice() {
 }
 
 const BMC_URL = 'https://buymeacoffee.com/riwajchalise'
+const LS_SUPPORT_SKIPS = 'iim_support_skips'
+
+function shouldShowSupport() {
+  try {
+    const n = parseInt(localStorage.getItem(LS_SUPPORT_SKIPS) || '0', 10)
+    if (n > 0) {
+      localStorage.setItem(LS_SUPPORT_SKIPS, String(n - 1))
+      return false
+    }
+  } catch { /* storage unavailable */ }
+  return true
+}
+
+function markSupported() {
+  try { localStorage.setItem(LS_SUPPORT_SKIPS, '20') } catch { /* storage unavailable */ }
+}
 
 const SAVE_CONFIGS = {
   image: { icon: '🖼️', title: 'Invoice Image Ready', label: 'PNG Image',    buttonText: 'Save to Gallery',  hint: 'Tap "Save Image" in the share sheet',          mimeType: 'image/png' },
@@ -31,18 +47,24 @@ function SupportModal({ open, onClose }) {
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-background rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
         <div className="text-3xl mb-3">☕</div>
-        <h2 className="font-bold text-base mb-2">Enjoying Invoice In Minute?</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-          This tool is made available ad-free and free of cost because of your generous contribution.
+        <h2 className="font-bold text-lg mb-2">Enjoying Invoice In Minute?</h2>
+        <p className="text-sm text-foreground/75 leading-relaxed mb-6">
+          This tool is made available <strong className="text-foreground font-semibold">ad-free and free of cost</strong> because of your generous contribution.
         </p>
-        <a href={BMC_URL} target="_blank" rel="noopener noreferrer" className="block w-full mb-2">
-          <Button className="w-full gap-2 bg-[#FFDD00] text-[#000000] hover:bg-[#FFDD00]/90 font-semibold border-0">
+        <a
+          href={BMC_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full mb-3"
+          onClick={() => { markSupported(); onClose() }}
+        >
+          <Button className="w-full gap-2 bg-[#FFDD00] text-[#000000] hover:bg-[#FFDD00]/90 font-bold text-base border-0 h-12">
             <span>☕</span> Support
           </Button>
         </a>
-        <Button variant="ghost" className="w-full text-muted-foreground" onClick={onClose}>
+        <button onClick={onClose} className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-1">
           Maybe next time
-        </Button>
+        </button>
       </div>
     </div>
   )
@@ -422,7 +444,7 @@ export default function App() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <DownloadMenu form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} onDownloaded={() => setShowSupportModal(true)} />
+            <DownloadMenu form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} onDownloaded={() => { if (shouldShowSupport()) setShowSupportModal(true) }} />
 
             <Button
               variant="outline"
@@ -467,7 +489,7 @@ export default function App() {
 
             {/* Bottom actions */}
             <div className="mt-8 pt-6 border-t space-y-2">
-              <DownloadMenuFull form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} onDownloaded={() => setShowSupportModal(true)} />
+              <DownloadMenuFull form={form} logo={logo} onMobileDownload={(type, blob, filename) => setPendingShare({ type, blob, filename })} onDownloaded={() => { if (shouldShowSupport()) setShowSupportModal(true) }} />
               <Button
                 variant="outline"
                 className="w-full gap-2 font-medium"
@@ -548,7 +570,7 @@ export default function App() {
       </footer>
 
       {/* Mobile pre-share modal */}
-      <MobileSaveModal pending={pendingShare} onClose={() => setPendingShare(null)} onSuccess={() => setShowSupportModal(true)} />
+      <MobileSaveModal pending={pendingShare} onClose={() => setPendingShare(null)} onSuccess={() => { if (shouldShowSupport()) setShowSupportModal(true) }} />
 
       {/* Post-download support modal */}
       <SupportModal open={showSupportModal} onClose={() => setShowSupportModal(false)} />
