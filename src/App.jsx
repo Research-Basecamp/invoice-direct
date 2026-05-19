@@ -499,6 +499,31 @@ export default function App() {
                 Print Invoice
               </Button>
             </div>
+
+            {/* Mobile footer — lives inside the scroll container so it never floats over the form */}
+            <footer className="lg:hidden no-print mt-10 pt-6 border-t pb-24">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary text-primary-foreground">
+                  <FileText className="h-3.5 w-3.5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm tracking-tight">Invoice In Minute</p>
+                  <p className="text-[10px] text-muted-foreground">Free online invoice generator</p>
+                </div>
+              </div>
+              <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground mb-4">
+                <Link to="/how-it-works" className="hover:text-foreground transition-colors">How it works</Link>
+                <Link to="/features"     className="hover:text-foreground transition-colors">Features</Link>
+                <Link to="/faq"          className="hover:text-foreground transition-colors">FAQ</Link>
+              </nav>
+              <div className="pt-4 border-t flex flex-col gap-1.5 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-green-500" />
+                  <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
+                </div>
+                <span>© {new Date().getFullYear()} Invoice In Minute</span>
+              </div>
+            </footer>
           </section>
 
           {/* Resizer — desktop only */}
@@ -540,8 +565,8 @@ export default function App() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="no-print border-t bg-background py-8 px-4 sm:px-6">
+      {/* Footer — desktop only; mobile footer lives inside the form scroll container */}
+      <footer className="hidden lg:block no-print border-t bg-background py-8 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-2">
