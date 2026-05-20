@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Select, SelectItem, SelectGroup } from '@/components/ui/select'
 import { AddressInput } from '@/components/ui/address-input'
-import { cn } from '@/lib/utils'
+import { cn, getBusinessIdLabel } from '@/lib/utils'
 import { Upload, Plus, Trash2, ImagePlus, ChevronDown, Check } from 'lucide-react'
 
 const CURRENCIES = [
@@ -260,6 +260,10 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
                   <Label>Address</Label>
                   <AddressInput value={form.fromAddress} onChange={(val) => updateField('fromAddress', val)} placeholder="Your address" />
                 </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <Label>{getBusinessIdLabel(form.currency)} <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+                  <Input value={form.fromBusinessId} onChange={(e) => updateField('fromBusinessId', e.target.value)} placeholder={`Your ${getBusinessIdLabel(form.currency)}`} />
+                </div>
               </div>
             </div>
           </div>
@@ -391,8 +395,8 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
 
       <Separator />
 
-      {/* Tax, Discount & Delivery */}
-      <div className="grid sm:grid-cols-3 gap-3">
+      {/* Tax, Discount, GST & Delivery */}
+      <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
           <Label>Discount (%)</Label>
           <Input type="number" min="0" max="100" step="0.1" value={form.discountRate} onChange={(e) => updateField('discountRate', e.target.value)} placeholder="0" />
@@ -400,6 +404,13 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
         <div className="space-y-1">
           <Label>Tax (%)</Label>
           <Input type="number" min="0" max="100" step="0.1" value={form.taxRate} onChange={(e) => updateField('taxRate', e.target.value)} placeholder="0" />
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <Label>GST (%)</Label>
+            <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Optional</span>
+          </div>
+          <Input type="number" min="0" max="100" step="0.1" value={form.gstRate} onChange={(e) => updateField('gstRate', e.target.value)} placeholder="0" />
         </div>
         <div className="space-y-1">
           <Label>Delivery / Shipping</Label>

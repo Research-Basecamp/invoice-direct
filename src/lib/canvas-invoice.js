@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate, displayAddress } from './utils'
+import { formatCurrency, formatDate, displayAddress, getBusinessIdLabel } from './utils'
 
 // Draws the invoice onto a 2× canvas using the Canvas 2D API.
 // Pure JS — no DOM rendering, no html2canvas. Runs in ~10 ms so
@@ -89,7 +89,7 @@ export async function generateInvoiceCanvas(form, logo) {
   hline(y, '#111111', 1.5); y += 24
 
   // ── From / Bill To ────────────────────────────────────────────────────
-  const party = (label, company, contact, address, email, phone, x, startY) => {
+  const party = (label, company, contact, address, email, phone, x, startY, businessId = null) => {
     let py = startY
     fnt(9, true);  clr('#9CA3AF'); txt(label.toUpperCase(), x, py); py += 15
     if (company) { fnt(12, true);  clr('#111111'); txt(company, x, py); py += 16 }
@@ -98,12 +98,15 @@ export async function generateInvoiceCanvas(form, logo) {
       .forEach(l => { fnt(11, false); clr('#555555'); txt(l, x, py); py += 13 })
     if (email) { fnt(11, false); clr('#555555'); txt(email, x, py); py += 13 }
     if (phone) { fnt(11, false); clr('#555555'); txt(phone, x, py); py += 13 }
+    if (businessId) { fnt(11, false); clr('#555555'); txt(businessId, x, py); py += 13 }
     return py
   }
 
+  const bidLabel = form.fromBusinessId ? `${getBusinessIdLabel(currency)}: ${form.fromBusinessId}` : null
+
   const addrY0 = y
-  const fromEnd = party('From', form.fromCompany, form.fromName, form.fromAddress, form.fromEmail, form.fromPhone, ML,  addrY0)
-  const toEnd   = party('Bill To', form.billToCompany, form.billToContact, form.billToAddress, form.billToEmail, form.billToPhone, MID, addrY0)
+  const fromEnd = party('From', form.fromCompany, form.fromName, form.fromAddress, form.fromEmail, form.fromPhone, ML,  addrY0, bidLabel)
+  const toEnd   = party('Bill To', form.billToCompany, form.billToContact, form.billToAddress, form.billToEmail, form.billToPhone, MID, addrY0, null)
 
   y = Math.max(fromEnd, toEnd) + 18
   hline(y); y += 20
@@ -137,8 +140,9 @@ export async function generateInvoiceCanvas(form, logo) {
   const discountAmt = subtotal * (parseFloat(form.discountRate) || 0) / 100
   const afterDisc   = subtotal - discountAmt
   const taxAmt      = afterDisc * (parseFloat(form.taxRate) || 0) / 100
+  const gstAmt      = afterDisc * (parseFloat(form.gstRate) || 0) / 100
   const deliveryAmt = parseFloat(form.delivery) || 0
-  const total       = afterDisc + taxAmt + deliveryAmt
+  const total       = afterDisc + taxAmt + gstAmt + deliveryAmt
 
   const lx = MR - 180
   const totRow = (label, value, bold = false) => {
@@ -149,6 +153,7 @@ export async function generateInvoiceCanvas(form, logo) {
   totRow('Subtotal', fmt(subtotal))
   if (discountAmt > 0) totRow(`Discount (${parseFloat(form.discountRate) || 0}%)`, `-${fmt(discountAmt)}`)
   if (taxAmt > 0)      totRow(`Tax (${parseFloat(form.taxRate) || 0}%)`, fmt(taxAmt))
+  if (gstAmt > 0)      totRow(`GST (${parseFloat(form.gstRate) || 0}%)`, fmt(gstAmt))
   if (deliveryAmt > 0) totRow('Delivery', fmt(deliveryAmt))
   y += 4; hline(y, '#111111', 1); y += 17
   totRow('Total', fmt(total), true)

@@ -132,7 +132,7 @@ function MobileSaveModal({ pending, onClose, onSuccess }) {
   )
 }
 
-const SENDER_KEYS = ['fromCompany', 'fromName', 'fromEmail', 'fromPhone', 'fromAddress', 'currency', 'logoScale']
+const SENDER_KEYS = ['fromCompany', 'fromName', 'fromEmail', 'fromPhone', 'fromAddress', 'fromBusinessId', 'currency', 'logoScale']
 const LS_SENDER = 'iim_sender'
 const LS_LOGO   = 'iim_logo'
 
@@ -149,6 +149,7 @@ const initialForm = {
   fromAddress: '',
   fromEmail: '',
   fromPhone: '',
+  fromBusinessId: '',
   billToCompany: '',
   billToContact: '',
   billToAddress: '',
@@ -161,6 +162,7 @@ const initialForm = {
   logoScale: 1,
   items: [{ description: '', quantity: 0, rate: 0 }],
   taxRate: '',
+  gstRate: '',
   discountRate: '',
   delivery: '',
   notes: '',

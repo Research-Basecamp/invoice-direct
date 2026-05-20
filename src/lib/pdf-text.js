@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf'
-import { formatCurrency, formatDate, displayAddress } from './utils'
+import { formatCurrency, formatDate, displayAddress, getBusinessIdLabel } from './utils'
 
 // Generates a clean text-based PDF using jsPDF's drawing API.
 // No html2canvas / DOM rendering — runs in milliseconds, safe to call
@@ -88,6 +88,7 @@ export async function generatePDFBlob(form, logo) {
     .forEach(l => { font(10, 'normal', [68, 68, 68]); w(l, ML, fromY); fromY += 13 })
   if (form.fromEmail) { font(10, 'normal', [68, 68, 68]); w(form.fromEmail, ML, fromY); fromY += 13 }
   if (form.fromPhone) { font(10, 'normal', [68, 68, 68]); w(form.fromPhone, ML, fromY); fromY += 13 }
+  if (form.fromBusinessId) { font(10, 'normal', [68, 68, 68]); w(`${getBusinessIdLabel(currency)}: ${form.fromBusinessId}`, ML, fromY); fromY += 13 }
 
   // BILL TO column (parallel)
   font(8, 'bold', [107, 114, 128])
@@ -132,8 +133,9 @@ export async function generatePDFBlob(form, logo) {
   const discountAmt = subtotal * (parseFloat(form.discountRate) || 0) / 100
   const afterDisc   = subtotal - discountAmt
   const taxAmt      = afterDisc * (parseFloat(form.taxRate) || 0) / 100
+  const gstAmt      = afterDisc * (parseFloat(form.gstRate) || 0) / 100
   const deliveryAmt = parseFloat(form.delivery) || 0
-  const total       = afterDisc + taxAmt + deliveryAmt
+  const total       = afterDisc + taxAmt + gstAmt + deliveryAmt
 
   const labelX = MR - 180
 
@@ -145,6 +147,7 @@ export async function generatePDFBlob(form, logo) {
   totalsRow('Subtotal', fmt(subtotal))
   if (discountAmt > 0) totalsRow(`Discount (${parseFloat(form.discountRate) || 0}%)`, `-${fmt(discountAmt)}`)
   if (taxAmt > 0)      totalsRow(`Tax (${parseFloat(form.taxRate) || 0}%)`, fmt(taxAmt))
+  if (gstAmt > 0)      totalsRow(`GST (${parseFloat(form.gstRate) || 0}%)`, fmt(gstAmt))
   if (deliveryAmt > 0) totalsRow('Delivery', fmt(deliveryAmt))
   y += 3; rule(y, [17, 17, 17], 1); y += 14
   totalsRow('Total', fmt(total), true)

@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate, displayAddress } from './utils'
+import { formatCurrency, formatDate, displayAddress, getBusinessIdLabel } from './utils'
 
 function esc(str) {
   return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -98,8 +98,9 @@ export function renderInvoiceContent(form, logo) {
   const discountAmt = subtotal * (parseFloat(form.discountRate) || 0) / 100
   const afterDiscount = subtotal - discountAmt
   const taxAmt = afterDiscount * (parseFloat(form.taxRate) || 0) / 100
+  const gstAmt = afterDiscount * (parseFloat(form.gstRate) || 0) / 100
   const deliveryAmt = parseFloat(form.delivery) || 0
-  const total = afterDiscount + taxAmt + deliveryAmt
+  const total = afterDiscount + taxAmt + gstAmt + deliveryAmt
 
   return `
   <div class="page">
@@ -123,6 +124,7 @@ export function renderInvoiceContent(form, logo) {
         ${form.fromAddress ? `<div class="party-detail">${addrHtml(form.fromAddress)}</div>` : ''}
         ${form.fromEmail ? `<div class="party-detail">${esc(form.fromEmail)}</div>` : ''}
         ${form.fromPhone ? `<div class="party-detail">${esc(form.fromPhone)}</div>` : ''}
+        ${form.fromBusinessId ? `<div class="party-detail" style="margin-top:4px">${esc(getBusinessIdLabel(currency))}: ${esc(form.fromBusinessId)}</div>` : ''}
       </div>
       <div>
         <div class="party-label">Bill To</div>
@@ -161,6 +163,7 @@ export function renderInvoiceContent(form, logo) {
         <div class="totals-row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
         ${discountAmt > 0 ? `<div class="totals-row"><span>Discount (${parseFloat(form.discountRate) || 0}%)</span><span>-${fmt(discountAmt)}</span></div>` : ''}
         ${taxAmt > 0 ? `<div class="totals-row"><span>Tax (${parseFloat(form.taxRate) || 0}%)</span><span>${fmt(taxAmt)}</span></div>` : ''}
+        ${gstAmt > 0 ? `<div class="totals-row"><span>GST (${parseFloat(form.gstRate) || 0}%)</span><span>${fmt(gstAmt)}</span></div>` : ''}
         ${deliveryAmt > 0 ? `<div class="totals-row"><span>Delivery</span><span>${fmt(deliveryAmt)}</span></div>` : ''}
         <div class="totals-row total"><span>Total</span><span>${fmt(total)}</span></div>
       </div>

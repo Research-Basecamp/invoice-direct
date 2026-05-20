@@ -2,7 +2,7 @@ import {
   Document, Packer, Paragraph, Table, TableRow, TableCell,
   TextRun, WidthType, AlignmentType, BorderStyle, ImageRun,
 } from 'docx'
-import { formatCurrency, formatDate, displayAddress, invoiceFilename } from './utils'
+import { formatCurrency, formatDate, displayAddress, invoiceFilename, getBusinessIdLabel } from './utils'
 
 // Letter paper: 12240 DXA wide. Margins left+right = 900+900 = 1800.
 // Content width = 12240 - 1800 = 10440 DXA
@@ -83,8 +83,9 @@ export async function generateDocxBlob(form, logo) {
   const discountAmt = subtotal * (parseFloat(form.discountRate) || 0) / 100
   const afterDisc   = subtotal - discountAmt
   const taxAmt      = afterDisc * (parseFloat(form.taxRate) || 0) / 100
+  const gstAmt      = afterDisc * (parseFloat(form.gstRate) || 0) / 100
   const deliveryAmt = parseFloat(form.delivery) || 0
-  const total       = afterDisc + taxAmt + deliveryAmt
+  const total       = afterDisc + taxAmt + gstAmt + deliveryAmt
 
   const ls = form.logoScale || 1
   const logoRun = logo ? await loadLogo(logo, 130 * ls, 65 * ls) : null
@@ -127,8 +128,9 @@ export async function generateDocxBlob(form, logo) {
         ...(form.fromCompany ? [p(r(form.fromCompany, { size: 22, bold: true }))] : []),
         ...(form.fromName    ? [p(r(form.fromName,    { size: 20, color: '333333' }))] : []),
         ...addrParagraphs(form.fromAddress),
-        ...(form.fromEmail   ? [p(r(form.fromEmail,   { size: 20, color: '444444' }))] : []),
-        ...(form.fromPhone   ? [p(r(form.fromPhone,   { size: 20, color: '444444' }))] : []),
+        ...(form.fromEmail      ? [p(r(form.fromEmail,      { size: 20, color: '444444' }))] : []),
+        ...(form.fromPhone      ? [p(r(form.fromPhone,      { size: 20, color: '444444' }))] : []),
+        ...(form.fromBusinessId ? [p(r(`${getBusinessIdLabel(form.currency || 'USD')}: ${form.fromBusinessId}`, { size: 20, color: '444444' }))] : []),
       ], { w: HALF }),
       cell([
         p(r('Bill To', { size: 16, bold: true, color: '6B7280', caps: true }), AlignmentType.LEFT, 40),
@@ -188,6 +190,7 @@ export async function generateDocxBlob(form, logo) {
   addRow('Subtotal', fmt(subtotal))
   if (discountAmt > 0) addRow(`Discount (${parseFloat(form.discountRate) || 0}%)`, `-${fmt(discountAmt)}`)
   if (taxAmt > 0)      addRow(`Tax (${parseFloat(form.taxRate) || 0}%)`,           fmt(taxAmt))
+  if (gstAmt > 0)      addRow(`GST (${parseFloat(form.gstRate) || 0}%)`,           fmt(gstAmt))
   if (deliveryAmt > 0) addRow('Delivery', fmt(deliveryAmt))
   addRow('Total', fmt(total), true)
 

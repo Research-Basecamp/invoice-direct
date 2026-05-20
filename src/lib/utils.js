@@ -52,6 +52,23 @@ export function displayAddress(addr) {
   return remaining ? `${street}\n${remaining}` : street
 }
 
+const BUSINESS_ID_LABELS = {
+  AUD: 'ABN / ACN',
+  NZD: 'NZBN',
+  USD: 'EIN',
+  GBP: 'Company No.',
+  CAD: 'Business No.',
+  INR: 'GSTIN',
+  SGD: 'UEN',
+  EUR: 'VAT No.',
+  ZAR: 'Tax No.',
+  MYR: 'SST No.',
+}
+
+export function getBusinessIdLabel(currency) {
+  return BUSINESS_ID_LABELS[currency] || 'Tax ID'
+}
+
 export function invoiceFilename(form) {
   const sanitize = (s) => (s || '').trim().replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '')
   const parts = [sanitize(form.billToCompany), sanitize(form.billToContact)].filter(Boolean)
