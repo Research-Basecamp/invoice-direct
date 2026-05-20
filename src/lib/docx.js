@@ -80,10 +80,13 @@ export async function generateDocxBlob(form, logo) {
 
   const items = (form.items || []).filter(i => i.description)
   const subtotal   = items.reduce((s, i) => s + i.quantity * i.rate, 0)
-  const discountAmt = subtotal * (parseFloat(form.discountRate) || 0) / 100
+  const dv = parseFloat(form.discountRate) || 0
+  const discountAmt = form.discountType === '$' ? dv : subtotal * dv / 100
   const afterDisc   = subtotal - discountAmt
-  const taxAmt      = afterDisc * (parseFloat(form.taxRate) || 0) / 100
-  const gstAmt      = afterDisc * (parseFloat(form.gstRate) || 0) / 100
+  const tv = parseFloat(form.taxRate) || 0
+  const taxAmt      = form.taxType === '$' ? tv : afterDisc * tv / 100
+  const gv = parseFloat(form.gstRate) || 0
+  const gstAmt      = form.gstType === '$' ? gv : afterDisc * gv / 100
   const deliveryAmt = parseFloat(form.delivery) || 0
   const total       = afterDisc + taxAmt + gstAmt + deliveryAmt
 
@@ -188,9 +191,9 @@ export async function generateDocxBlob(form, logo) {
   }
 
   addRow('Subtotal', fmt(subtotal))
-  if (discountAmt > 0) addRow(`Discount (${parseFloat(form.discountRate) || 0}%)`, `-${fmt(discountAmt)}`)
-  if (taxAmt > 0)      addRow(`Tax (${parseFloat(form.taxRate) || 0}%)`,           fmt(taxAmt))
-  if (gstAmt > 0)      addRow(`GST (${parseFloat(form.gstRate) || 0}%)`,           fmt(gstAmt))
+  if (discountAmt > 0) addRow(form.discountType === '$' ? 'Discount' : `Discount (${parseFloat(form.discountRate) || 0}%)`, `-${fmt(discountAmt)}`)
+  if (taxAmt > 0)      addRow(form.taxType === '$' ? 'Tax' : `Tax (${parseFloat(form.taxRate) || 0}%)`,           fmt(taxAmt))
+  if (gstAmt > 0)      addRow(form.gstType === '$' ? 'GST' : `GST (${parseFloat(form.gstRate) || 0}%)`,           fmt(gstAmt))
   if (deliveryAmt > 0) addRow('Delivery', fmt(deliveryAmt))
   addRow('Total', fmt(total), true)
 

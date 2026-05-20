@@ -95,10 +95,13 @@ export function renderInvoiceContent(form, logo) {
 
   const items = (form.items || []).filter(i => i.description)
   const subtotal = items.reduce((s, i) => s + i.quantity * i.rate, 0)
-  const discountAmt = subtotal * (parseFloat(form.discountRate) || 0) / 100
+  const dv = parseFloat(form.discountRate) || 0
+  const discountAmt = form.discountType === '$' ? dv : subtotal * dv / 100
   const afterDiscount = subtotal - discountAmt
-  const taxAmt = afterDiscount * (parseFloat(form.taxRate) || 0) / 100
-  const gstAmt = afterDiscount * (parseFloat(form.gstRate) || 0) / 100
+  const tv = parseFloat(form.taxRate) || 0
+  const taxAmt = form.taxType === '$' ? tv : afterDiscount * tv / 100
+  const gv = parseFloat(form.gstRate) || 0
+  const gstAmt = form.gstType === '$' ? gv : afterDiscount * gv / 100
   const deliveryAmt = parseFloat(form.delivery) || 0
   const total = afterDiscount + taxAmt + gstAmt + deliveryAmt
 
@@ -161,9 +164,9 @@ export function renderInvoiceContent(form, logo) {
     <div class="totals">
       <div class="totals-inner">
         <div class="totals-row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
-        ${discountAmt > 0 ? `<div class="totals-row"><span>Discount (${parseFloat(form.discountRate) || 0}%)</span><span>-${fmt(discountAmt)}</span></div>` : ''}
-        ${taxAmt > 0 ? `<div class="totals-row"><span>Tax (${parseFloat(form.taxRate) || 0}%)</span><span>${fmt(taxAmt)}</span></div>` : ''}
-        ${gstAmt > 0 ? `<div class="totals-row"><span>GST (${parseFloat(form.gstRate) || 0}%)</span><span>${fmt(gstAmt)}</span></div>` : ''}
+        ${discountAmt > 0 ? `<div class="totals-row"><span>${form.discountType === '$' ? 'Discount' : `Discount (${parseFloat(form.discountRate) || 0}%)`}</span><span>-${fmt(discountAmt)}</span></div>` : ''}
+        ${taxAmt > 0 ? `<div class="totals-row"><span>${form.taxType === '$' ? 'Tax' : `Tax (${parseFloat(form.taxRate) || 0}%)`}</span><span>${fmt(taxAmt)}</span></div>` : ''}
+        ${gstAmt > 0 ? `<div class="totals-row"><span>${form.gstType === '$' ? 'GST' : `GST (${parseFloat(form.gstRate) || 0}%)`}</span><span>${fmt(gstAmt)}</span></div>` : ''}
         ${deliveryAmt > 0 ? `<div class="totals-row"><span>Delivery</span><span>${fmt(deliveryAmt)}</span></div>` : ''}
         <div class="totals-row total"><span>Total</span><span>${fmt(total)}</span></div>
       </div>

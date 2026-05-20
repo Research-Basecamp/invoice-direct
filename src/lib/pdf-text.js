@@ -130,10 +130,13 @@ export async function generatePDFBlob(form, logo) {
 
   // ── Totals ──────────────────────────────────────────────────────────
   const subtotal    = items.reduce((s, i) => s + i.quantity * i.rate, 0)
-  const discountAmt = subtotal * (parseFloat(form.discountRate) || 0) / 100
+  const dv = parseFloat(form.discountRate) || 0
+  const discountAmt = form.discountType === '$' ? dv : subtotal * dv / 100
   const afterDisc   = subtotal - discountAmt
-  const taxAmt      = afterDisc * (parseFloat(form.taxRate) || 0) / 100
-  const gstAmt      = afterDisc * (parseFloat(form.gstRate) || 0) / 100
+  const tv = parseFloat(form.taxRate) || 0
+  const taxAmt      = form.taxType === '$' ? tv : afterDisc * tv / 100
+  const gv = parseFloat(form.gstRate) || 0
+  const gstAmt      = form.gstType === '$' ? gv : afterDisc * gv / 100
   const deliveryAmt = parseFloat(form.delivery) || 0
   const total       = afterDisc + taxAmt + gstAmt + deliveryAmt
 
@@ -145,9 +148,9 @@ export async function generatePDFBlob(form, logo) {
   }
 
   totalsRow('Subtotal', fmt(subtotal))
-  if (discountAmt > 0) totalsRow(`Discount (${parseFloat(form.discountRate) || 0}%)`, `-${fmt(discountAmt)}`)
-  if (taxAmt > 0)      totalsRow(`Tax (${parseFloat(form.taxRate) || 0}%)`, fmt(taxAmt))
-  if (gstAmt > 0)      totalsRow(`GST (${parseFloat(form.gstRate) || 0}%)`, fmt(gstAmt))
+  if (discountAmt > 0) totalsRow(form.discountType === '$' ? 'Discount' : `Discount (${parseFloat(form.discountRate) || 0}%)`, `-${fmt(discountAmt)}`)
+  if (taxAmt > 0)      totalsRow(form.taxType === '$' ? 'Tax' : `Tax (${parseFloat(form.taxRate) || 0}%)`, fmt(taxAmt))
+  if (gstAmt > 0)      totalsRow(form.gstType === '$' ? 'GST' : `GST (${parseFloat(form.gstRate) || 0}%)`, fmt(gstAmt))
   if (deliveryAmt > 0) totalsRow('Delivery', fmt(deliveryAmt))
   y += 3; rule(y, [17, 17, 17], 1); y += 14
   totalsRow('Total', fmt(total), true)

@@ -45,6 +45,23 @@ const CURRENCIES = [
 
 const emptyItem = { description: '', quantity: 0, rate: 0 }
 
+function TypeToggle({ value, onChange }) {
+  return (
+    <div className="flex rounded overflow-hidden border border-border text-[10px] h-[18px] shrink-0">
+      <button
+        type="button"
+        onClick={() => onChange('%')}
+        className={cn('px-1.5 transition-colors leading-none', value !== '$' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground')}
+      >%</button>
+      <button
+        type="button"
+        onClick={() => onChange('$')}
+        className={cn('px-1.5 border-l border-border transition-colors leading-none', value === '$' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground')}
+      >$</button>
+    </div>
+  )
+}
+
 export default function InvoiceForm({ form, setForm, logo, setLogo }) {
   const hasSaved = !!(logo || form.fromCompany || form.fromName || form.fromEmail || form.fromPhone || form.fromAddress)
   const [senderOpen, setSenderOpen] = useState(!hasSaved)
@@ -398,16 +415,25 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
       {/* Tax, Discount, GST & Delivery */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
-          <Label>Discount (%) <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
-          <Input type="number" min="0" max="100" step="0.1" value={form.discountRate} onChange={(e) => updateField('discountRate', e.target.value)} placeholder="0" />
+          <div className="flex items-center justify-between">
+            <Label>Discount <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+            <TypeToggle value={form.discountType} onChange={(v) => updateField('discountType', v)} />
+          </div>
+          <Input type="number" min="0" step={form.discountType === '$' ? '0.01' : '0.1'} max={form.discountType === '%' ? '100' : undefined} value={form.discountRate} onChange={(e) => updateField('discountRate', e.target.value)} placeholder="0" />
         </div>
         <div className="space-y-1">
-          <Label>Tax (%) <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
-          <Input type="number" min="0" max="100" step="0.1" value={form.taxRate} onChange={(e) => updateField('taxRate', e.target.value)} placeholder="0" />
+          <div className="flex items-center justify-between">
+            <Label>Tax <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+            <TypeToggle value={form.taxType} onChange={(v) => updateField('taxType', v)} />
+          </div>
+          <Input type="number" min="0" step={form.taxType === '$' ? '0.01' : '0.1'} max={form.taxType === '%' ? '100' : undefined} value={form.taxRate} onChange={(e) => updateField('taxRate', e.target.value)} placeholder="0" />
         </div>
         <div className="space-y-1">
-          <Label>GST (%) <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
-          <Input type="number" min="0" max="100" step="0.1" value={form.gstRate} onChange={(e) => updateField('gstRate', e.target.value)} placeholder="0" />
+          <div className="flex items-center justify-between">
+            <Label>GST <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
+            <TypeToggle value={form.gstType} onChange={(v) => updateField('gstType', v)} />
+          </div>
+          <Input type="number" min="0" step={form.gstType === '$' ? '0.01' : '0.1'} max={form.gstType === '%' ? '100' : undefined} value={form.gstRate} onChange={(e) => updateField('gstRate', e.target.value)} placeholder="0" />
         </div>
         <div className="space-y-1">
           <Label>Delivery / Shipping <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
