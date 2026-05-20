@@ -10,7 +10,7 @@ export default function PageLayout({ children, title, description }) {
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
               <FileText className="h-4 w-4" />
             </div>
-            <span className="font-bold text-base tracking-tight">Invoice In Minute</span>
+            <span className="font-bold text-base tracking-tight">Invoice In A Minute</span>
           </Link>
           <nav className="flex items-center gap-1 sm:gap-4 text-sm text-muted-foreground">
             <Link to="/how-it-works" className="hidden sm:block hover:text-foreground transition-colors">How it works</Link>
@@ -42,8 +42,8 @@ export default function PageLayout({ children, title, description }) {
                 <FileText className="h-3.5 w-3.5" />
               </div>
               <div>
-                <p className="font-bold text-sm tracking-tight">Invoice In Minute</p>
-                <p className="text-[10px] text-muted-foreground">Free online invoice generator</p>
+                <p className="font-bold text-sm tracking-tight">Invoice In A Minute</p>
+                <p className="text-[10px] text-muted-foreground">FREE · QUICK · PRIVATE</p>
               </div>
             </Link>
             <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
@@ -57,7 +57,7 @@ export default function PageLayout({ children, title, description }) {
               <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-green-500" />
               <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
             </div>
-            <span>© {new Date().getFullYear()} Invoice In Minute</span>
+            <span>© {new Date().getFullYear()} Invoice In A Minute</span>
           </div>
         </div>
       </footer>

@@ -47,7 +47,7 @@ function SupportModal({ open, onClose }) {
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-background rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
         <div className="text-3xl mb-3">☕</div>
-        <h2 className="font-bold text-lg mb-2">Thank you for using Invoice In Minute!</h2>
+        <h2 className="font-bold text-lg mb-2">Thank you for using Invoice In A Minute!</h2>
         <p className="text-sm text-foreground/75 leading-relaxed mb-6">
           Your invoice is ready ☕ — if this saved you time, a coffee keeps the tool free for everyone.
         </p>
@@ -437,8 +437,8 @@ export default function App() {
               <FileText className="h-4 w-4" />
             </div>
             <div className="leading-tight">
-              <span className="font-bold text-base tracking-tight">Invoice In Minute</span>
-              <p className="text-[10px] text-muted-foreground hidden sm:block">Free invoice generator</p>
+              <span className="font-bold text-base tracking-tight">Invoice In A Minute</span>
+              <p className="text-[10px] text-muted-foreground hidden sm:block tracking-wide">FREE · QUICK · PRIVATE</p>
             </div>
           </div>
 
@@ -507,8 +507,8 @@ export default function App() {
                   <FileText className="h-3.5 w-3.5" />
                 </div>
                 <div>
-                  <p className="font-bold text-sm tracking-tight">Invoice In Minute</p>
-                  <p className="text-[10px] text-muted-foreground">Free online invoice generator</p>
+                  <p className="font-bold text-sm tracking-tight">Invoice In A Minute</p>
+                  <p className="text-[10px] text-muted-foreground">FREE · QUICK · PRIVATE</p>
                 </div>
               </div>
               <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground mb-4">
@@ -521,7 +521,7 @@ export default function App() {
                   <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-green-500" />
                   <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
                 </div>
-                <span>© {new Date().getFullYear()} Invoice In Minute</span>
+                <span>© {new Date().getFullYear()} Invoice In A Minute</span>
               </div>
             </footer>
           </section>
@@ -574,8 +574,8 @@ export default function App() {
                 <FileText className="h-3.5 w-3.5" />
               </div>
               <div>
-                <p className="font-bold text-sm tracking-tight">Invoice In Minute</p>
-                <p className="text-[10px] text-muted-foreground">Free online invoice generator</p>
+                <p className="font-bold text-sm tracking-tight">Invoice In A Minute</p>
+                <p className="text-[10px] text-muted-foreground">FREE · QUICK · PRIVATE</p>
               </div>
             </div>
             <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
@@ -589,7 +589,7 @@ export default function App() {
               <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-green-500" />
               <span>Your data never leaves your device — nothing is stored or sent to any server.</span>
             </div>
-            <span>© {new Date().getFullYear()} Invoice In Minute</span>
+            <span>© {new Date().getFullYear()} Invoice In A Minute</span>
           </div>
         </div>
       </footer>

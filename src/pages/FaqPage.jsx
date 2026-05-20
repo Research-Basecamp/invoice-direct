@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 
 const FAQS = [
   {
-    q: 'Is Invoice In Minute really free?',
+    q: 'Is Invoice In A Minute really free?',
     a: 'Yes, completely free. No account required, no subscription, no hidden fees — ever. Create, preview and download as many invoices as you like at no cost.',
   },
   {
@@ -37,7 +37,7 @@ const FAQS = [
   },
   {
     q: 'Do I need to create an account?',
-    a: 'No account needed. Invoice In Minute works entirely in your browser with no login required.',
+    a: 'No account needed. Invoice In A Minute works entirely in your browser with no login required.',
   },
 ]
 
@@ -45,7 +45,7 @@ export default function FaqPage() {
   return (
     <PageLayout
       title="Frequently asked questions"
-      description="Common questions about Invoice In Minute."
+      description="Common questions about Invoice In A Minute."
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
         <div className="space-y-6 mb-16">
