@@ -285,11 +285,11 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
             <Input value={form.billToContact} onChange={(e) => updateField('billToContact', e.target.value)} placeholder="Name or dept." />
           </div>
           <div className="space-y-1">
-            <Label>Email</Label>
+            <Label>Email <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
             <Input value={form.billToEmail} onChange={(e) => updateField('billToEmail', e.target.value)} placeholder="client@email.com" />
           </div>
           <div className="space-y-1">
-            <Label>Phone</Label>
+            <Label>Phone <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
             <Input value={form.billToPhone} onChange={(e) => updateField('billToPhone', e.target.value)} placeholder="Client phone" />
           </div>
           <div className="space-y-1 sm:col-span-2">
@@ -312,7 +312,7 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
           <Input type="date" value={form.dueDate} onChange={(e) => updateField('dueDate', e.target.value)} />
         </div>
         <div className="space-y-1">
-          <Label>Invoice # <span className="text-muted-foreground">(optional)</span></Label>
+          <Label>Invoice # <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
           <Input value={form.invoiceNumber} onChange={(e) => updateField('invoiceNumber', e.target.value)} placeholder="INV-001" />
         </div>
       </div>
@@ -398,22 +398,19 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
       {/* Tax, Discount, GST & Delivery */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
-          <Label>Discount (%)</Label>
+          <Label>Discount (%) <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
           <Input type="number" min="0" max="100" step="0.1" value={form.discountRate} onChange={(e) => updateField('discountRate', e.target.value)} placeholder="0" />
         </div>
         <div className="space-y-1">
-          <Label>Tax (%)</Label>
+          <Label>Tax (%) <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
           <Input type="number" min="0" max="100" step="0.1" value={form.taxRate} onChange={(e) => updateField('taxRate', e.target.value)} placeholder="0" />
         </div>
         <div className="space-y-1">
-          <div className="flex items-center gap-1.5">
-            <Label>GST (%)</Label>
-            <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">Optional</span>
-          </div>
+          <Label>GST (%) <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
           <Input type="number" min="0" max="100" step="0.1" value={form.gstRate} onChange={(e) => updateField('gstRate', e.target.value)} placeholder="0" />
         </div>
         <div className="space-y-1">
-          <Label>Delivery / Shipping</Label>
+          <Label>Delivery / Shipping <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
           <Input type="number" min="0" step="0.01" value={form.delivery} onChange={(e) => updateField('delivery', e.target.value)} placeholder="0.00" />
         </div>
       </div>
@@ -423,11 +420,11 @@ export default function InvoiceForm({ form, setForm, logo, setLogo }) {
       {/* Notes & Payment Terms */}
       <div className="grid sm:grid-cols-2 gap-3">
         <div className="space-y-1">
-          <Label>Notes</Label>
+          <Label>Notes <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
           <Textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} placeholder="Additional notes..." rows={3} />
         </div>
         <div className="space-y-1">
-          <Label>Payment Terms</Label>
+          <Label>Payment Terms <span className="text-[10px] text-muted-foreground">(optional)</span></Label>
           <Textarea value={form.paymentTerms} onChange={(e) => updateField('paymentTerms', e.target.value)} placeholder="Payment terms..." rows={3} />
         </div>
       </div>
