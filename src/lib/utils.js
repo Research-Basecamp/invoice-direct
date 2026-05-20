@@ -38,11 +38,12 @@ export function displayAddress(addr) {
   if (zipIdx !== -1) {
     const zip = rest[zipIdx]
     const state = zipIdx > 0 ? rest[zipIdx - 1] : ''
-    // Walk backwards past any "County"-suffixed intermediate parts to find the city
-    let cityIdx = zipIdx - 2
-    while (cityIdx >= 0 && /\bcounty\b/i.test(rest[cityIdx])) cityIdx--
-    const city = cityIdx >= 0 ? rest[cityIdx] : ''
-    const cityLine = [city, state, zip].filter(Boolean).join(', ')
+    // Always take rest[0] as the suburb/locality. Nominatim puts the most
+    // specific name first, then may insert council areas or city names before
+    // the state (e.g. "Bundoora, Melbourne, Victoria, 3083"). Using rest[0]
+    // ensures "Bundoora" is preserved rather than the intermediate city.
+    const suburb = zipIdx >= 2 ? rest[0] : ''
+    const cityLine = [suburb, state, zip].filter(Boolean).join(', ')
     const country = rest.slice(zipIdx + 1).join(', ')
     return [street, cityLine, country].filter(Boolean).join('\n')
   }
